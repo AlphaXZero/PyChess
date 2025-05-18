@@ -44,6 +44,7 @@ def draw_grid():
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
     draw_queen(1, 1, "black")
+    draw_king(1, 2, "black")
 
 
 def draw_knight(x, y, color):
@@ -142,6 +143,30 @@ def draw_queen(x, y, color):
     )
     # rond sommet
     canvas.create_oval(x + 23, y + 5, x + 27, y + 10, outline=color, fill=color)
+
+
+def draw_king(x, y, color):
+    global canvas
+    x, y = x * 50, y * 50
+    # base
+    canvas.create_rectangle(x + 5, y + 40, x + 45, y + 45, outline=color, fill=color)
+    # traèze
+    canvas.create_polygon(
+        x + 10,
+        y + 40,
+        x + 40,
+        y + 40,
+        x + 35,
+        y + 25,
+        x + 15,
+        y + 25,
+        outline=color,
+        fill=color,
+    )
+    # sommet vertical
+    canvas.create_rectangle(x + 23, y + 25, x + 27, y + 5, outline=color, fill=color)
+    # sommet horizontal
+    canvas.create_rectangle(x + 14, y + 12, x + 36, y + 14, outline=color, fill=color)
 
 
 if __name__ == "__main__":
