@@ -76,8 +76,8 @@ def print_board(board):
         print()
 
 
-def print_board_highlight(board, cell2):
-    highlight = list_valid_move(board, cell2)
+def print_board_highlight(board, cell):
+    highlight = list_valid_move(board, cell)
     c.init()
     for i, line in enumerate(board):
         print(i, end=" ")
