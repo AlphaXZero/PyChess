@@ -53,7 +53,7 @@ import pytest
 #     assert a == rand_height
 
 
-# j'utilise ça pour faire des catégories pour mes tests mais on peut enlever si c'est vraiment interdit les objets (:
+# j'utilise une class faire des catégories pour mes tests mais on peut enlever si c'est vraiment interdit les objets (:
 class TestKnight:
     def test_knight_moves_center(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
@@ -109,3 +109,72 @@ class TestKnight:
         moves = main.list_valid_move(board, (6, 7))
         expected_moves = [(4, 6), (7, 5), (5, 5)]
         assert sorted(moves) == sorted(expected_moves)
+
+
+class TestRook:
+    def test_rook_center(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "w")
+        moves = main.list_valid_move(board, (4, 4))
+        expected_moves = [
+            (0, 4),
+            (1, 4),
+            (2, 4),
+            (3, 4),
+            (5, 4),
+            (6, 4),
+            (7, 4),
+            (4, 0),
+            (4, 1),
+            (4, 2),
+            (4, 3),
+            (4, 5),
+            (4, 6),
+            (4, 7),
+        ]
+        assert sorted(moves) == sorted(expected_moves)
+
+    def test_rook_blocked_by_allies(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "w")
+        board[4][6] = ("pawnw", "w")  # Alliée à droite
+        board[2][4] = ("pawnw", "w")  # Alliée en haut
+
+        expected_moves = [
+            (3, 4),  # Vers le haut (avant l'alliée)
+            (5, 4),
+            (6, 4),
+            (7, 4),  # Vers le bas
+            (4, 3),
+            (4, 2),
+            (4, 1),
+            (4, 0),  # Vers la gauche
+            (4, 5),  # Vers la droite, avant l'alliée
+        ]
+
+        actual_moves = main.list_valid_move(board, (4, 4))
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_rook_can_capture_enemies(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "w")
+        board[4][6] = ("pawnb", "b")  # Ennemi à droite
+        board[1][4] = ("queen", "b")  # Ennemi en haut
+
+        expected_moves = [
+            (3, 4),
+            (2, 4),
+            (1, 4),  # Monte jusqu'à l'ennemi
+            (5, 4),
+            (6, 4),
+            (7, 4),  # Vers le bas
+            (4, 3),
+            (4, 2),
+            (4, 1),
+            (4, 0),  # Vers la gauche
+            (4, 5),
+            (4, 6),  # Jusqu'à l'ennemi à droite
+        ]
+
+        actual_moves = main.list_valid_move(board, (4, 4))
+        assert sorted(actual_moves) == sorted(expected_moves)

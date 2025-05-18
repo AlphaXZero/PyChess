@@ -93,8 +93,8 @@ def list_valid_move(board, cell) -> list:
                         move_list.append((actualy, actualx))
                         actual_position = (actualy, actualx)
                         # TODO : MOCHE CHANGER !
-                        if board[actualy, actualx] != "00":
-                            break
+                    if board[actualy][actualx] != "00":
+                        break
                 else:
                     break
         else:
@@ -110,9 +110,7 @@ def move_piece(board): ...
 
 
 if __name__ == "__main__":
-    import pytest
-
-    pytest.main(["-v", "test_main.py"])
-    board_void[6][7] = ("knight", "w")
-    print(list_valid_move(board_void, (6, 7)))
+    board_void[4][4] = ("rook", "w")
+    board_void[4][1] = ("rook", "w")
+    print(list_valid_move(board_void, (4, 4)))
     print_board(board_void)
