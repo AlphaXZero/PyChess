@@ -70,7 +70,7 @@ def draw_knight(x, y, color):
     # rectanle oreille
     canvas.create_rectangle(x + 30, y + 5, x + 40, y + 10, outline=color, fill=color)
     # cercle oeil
-    # TODO CHANEGER
+    # TODO CHANEGER couleur
     canvas.create_oval(
         x + 30,
         y + 15,
@@ -83,7 +83,17 @@ def draw_knight(x, y, color):
 
 def draw_rook(x, y, color):
     global canvas
-    canvas.create_rectangle(x + 10, y + 35, x + 10, y + 45, outline=color, fill=color)
+    x, y = x * 50, y * 50
+    # base
+    canvas.create_rectangle(x + 10, y + 35, x + 40, y + 45, outline=color, fill=color)
+    # rectanngle corps
+    canvas.create_rectangle(x + 15, y + 20, x + 35, y + 40, outline=color, fill=color)
+    # rectangle sommet
+    canvas.create_rectangle(x + 12, y + 10, x + 38, y + 20, outline=color, fill=color)
+    # petit rectangles sommets
+    canvas.create_rectangle(x + 12, y + 5, x + 17, y + 10, outline=color, fill=color)
+    canvas.create_rectangle(x + 22, y + 5, x + 27, y + 10, outline=color, fill=color)
+    canvas.create_rectangle(x + 33, y + 5, x + 38, y + 10, outline=color, fill=color)
 
 
 if __name__ == "__main__":
