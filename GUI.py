@@ -43,8 +43,6 @@ def draw_grid():
                 canvas.create_rectangle(
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
-    draw_queen(1, 1, "black")
-    draw_king(1, 2, "black")
 
 
 def draw_knight(x, y, color):
