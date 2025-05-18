@@ -44,12 +44,12 @@ board = [
         ("knight", "b"),
         ("rook", "b"),
     ],
-    [("pawnb", "b") for i in range(8)],
-    ["00" for i in range(8)],
-    ["00" for i in range(8)],
-    ["00" for i in range(8)],
-    ["00" for i in range(8)],
-    [("pawnw", "w") for i in range(8)],
+    [("pawnb", "b") for _ in range(8)],
+    ["00" for _ in range(8)],
+    ["00" for _ in range(8)],
+    ["00" for _ in range(8)],
+    ["00" for _ in range(8)],
+    [("pawnw", "w") for _ in range(8)],
     [
         ("rook", "w"),
         ("knight", "w"),
@@ -61,6 +61,8 @@ board = [
         ("rook", "w"),
     ],
 ]
+
+board_void = [["00" for _ in range(8)] for _ in range(8)]
 
 
 def print_board(board):
@@ -108,6 +110,9 @@ def move_piece(board): ...
 
 
 if __name__ == "__main__":
-    board[3][3] = ("knight", "w")
-    print(list_valid_move(board, (3, 3)))
-    print_board(board)
+    import pytest
+
+    pytest.main(["-v", "test_main.py"])
+    board_void[6][7] = ("knight", "w")
+    print(list_valid_move(board_void, (6, 7)))
+    print_board(board_void)
