@@ -34,12 +34,56 @@ def draw_grid():
         for y in range(8):
             if i % 2 == y % 2:
                 canvas.create_rectangle(
-                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="white"
+                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="lightgoldenrod1"
                 )
             else:
                 canvas.create_rectangle(
-                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="grey"
+                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
+    draw_rook(1, 1, "black")
+    draw_knight(1, 2, "black")
+    draw_knight(1, 3, "black")
+    draw_knight(1, 4, "black")
+    draw_rook(2, 1, "snow")
+    draw_knight(2, 2, "snow")
+    draw_knight(2, 3, "snow")
+    draw_knight(2, 4, "snow")
+
+
+def draw_knight(x, y, color):
+    global canvas
+    x, y = x * 50, y * 50
+    # rectangle nez
+    canvas.create_rectangle(x + 10, y + 20, x + 45, y + 30, outline=color, fill=color)
+    # triangle nez
+    canvas.create_polygon(
+        x + 10, y + 20, x + 34, y + 20, x + 35, y + 10, outline=color, fill=color
+    )
+    # rectangle corps
+    canvas.create_rectangle(x + 30, y + 10, x + 45, y + 45, outline=color, fill=color)
+    # base
+    canvas.create_rectangle(x + 20, y + 40, x + 45, y + 45, outline=color, fill=color)
+    # triangle pied
+    canvas.create_polygon(
+        x + 20, y + 40, x + 35, y + 30, x + 35, y + 40, outline=color, fill=color
+    )
+    # rectanle oreille
+    canvas.create_rectangle(x + 30, y + 5, x + 40, y + 10, outline=color, fill=color)
+    # cercle oeil
+    # TODO CHANEGER
+    canvas.create_oval(
+        x + 30,
+        y + 15,
+        x + 35,
+        y + 20,
+        outline=color,
+        fill="white" if color == "black" else "black",
+    )
+
+
+def draw_rook(x, y, color):
+    global canvas
+    canvas.create_rectangle(x + 10, y + 35, x + 10, y + 45, outline=color, fill=color)
 
 
 if __name__ == "__main__":
