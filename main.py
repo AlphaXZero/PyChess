@@ -1,3 +1,6 @@
+import colorama as c
+
+
 PIECES = {
     "knight": {
         "moves": (
@@ -73,6 +76,19 @@ def print_board(board):
         print()
 
 
+def print_board_highlight(board, cell2):
+    highlight = list_valid_move(board, cell2)
+    c.init()
+    for i, line in enumerate(board):
+        print(i, end=" ")
+        for y, cell in enumerate(line):
+            if (i, y) in highlight:
+                print(c.Fore.RED + cell[0][0] + c.Style.RESET_ALL, end=" ")
+            else:
+                print(cell[0][0], end=" ")
+        print()
+
+
 def get_piece(board, cell):
     # TODO : case vide
     return board[cell[0]][cell[1]]
@@ -110,7 +126,8 @@ def move_piece(board): ...
 
 
 if __name__ == "__main__":
-    board_void[4][4] = ("rook", "w")
-    board_void[4][1] = ("rook", "w")
-    print(list_valid_move(board_void, (4, 4)))
-    print_board(board_void)
+    board_void[4][4] = ("queen", "w")
+    board_void[4][1] = ("queen", "w")
+    board_void[1][1] = ("queen", "b")
+    print(sorted(list_valid_move(board_void, (4, 4))))
+    print_board_highlight(board_void, (4, 4))

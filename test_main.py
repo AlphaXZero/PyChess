@@ -137,19 +137,18 @@ class TestRook:
     def test_rook_blocked_by_allies(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "w")
-        board[4][6] = ("pawnw", "w")  # Alliée à droite
-        board[2][4] = ("pawnw", "w")  # Alliée en haut
-
+        board[4][6] = ("pawnw", "w")
+        board[2][4] = ("pawnw", "w")
         expected_moves = [
-            (3, 4),  # Vers le haut (avant l'alliée)
+            (3, 4),
             (5, 4),
             (6, 4),
-            (7, 4),  # Vers le bas
+            (7, 4),
             (4, 3),
             (4, 2),
             (4, 1),
-            (4, 0),  # Vers la gauche
-            (4, 5),  # Vers la droite, avant l'alliée
+            (4, 0),
+            (4, 5),
         ]
 
         actual_moves = main.list_valid_move(board, (4, 4))
@@ -158,22 +157,130 @@ class TestRook:
     def test_rook_can_capture_enemies(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "w")
-        board[4][6] = ("pawnb", "b")  # Ennemi à droite
-        board[1][4] = ("queen", "b")  # Ennemi en haut
+        board[4][6] = ("pawnb", "b")
+        board[1][4] = ("queen", "b")
 
         expected_moves = [
             (3, 4),
             (2, 4),
-            (1, 4),  # Monte jusqu'à l'ennemi
+            (1, 4),
             (5, 4),
             (6, 4),
-            (7, 4),  # Vers le bas
+            (7, 4),
             (4, 3),
             (4, 2),
             (4, 1),
-            (4, 0),  # Vers la gauche
+            (4, 0),
             (4, 5),
-            (4, 6),  # Jusqu'à l'ennemi à droite
+            (4, 6),
+        ]
+
+        actual_moves = main.list_valid_move(board, (4, 4))
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+
+class TestQueen:
+    def test_queen_center_clear(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("queen", "w")
+        expected_moves = [
+            (0, 0),
+            (0, 4),
+            (1, 1),
+            (1, 4),
+            (1, 7),
+            (2, 2),
+            (2, 4),
+            (2, 6),
+            (3, 3),
+            (3, 4),
+            (3, 5),
+            (4, 0),
+            (4, 1),
+            (4, 2),
+            (4, 3),
+            (4, 5),
+            (4, 6),
+            (4, 7),
+            (5, 3),
+            (5, 4),
+            (5, 5),
+            (6, 2),
+            (6, 4),
+            (6, 6),
+            (7, 1),
+            (7, 4),
+            (7, 7),
+        ]
+
+        actual_moves = main.list_valid_move(board, (4, 4))
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_queen_blocked_by_allies(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("queen", "w")
+        board[4][1] = ("pawnw", "w")
+        board[1][1] = ("queen", "w")
+        expected_moves = [
+            (0, 4),
+            (1, 4),
+            (1, 7),
+            (2, 2),
+            (2, 4),
+            (2, 6),
+            (3, 3),
+            (3, 4),
+            (3, 5),
+            (4, 2),
+            (4, 3),
+            (4, 5),
+            (4, 6),
+            (4, 7),
+            (5, 3),
+            (5, 4),
+            (5, 5),
+            (6, 2),
+            (6, 4),
+            (6, 6),
+            (7, 1),
+            (7, 4),
+            (7, 7),
+        ]
+
+        actual_moves = main.list_valid_move(board, (4, 4))
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_queen_can_capture_enemies(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("queen", "w")
+        board[4][1] = ("queen", "w")
+        board[1][1] = ("queen", "b")
+
+        expected_moves = [
+            (0, 4),
+            (1, 1),
+            (1, 4),
+            (1, 7),
+            (2, 2),
+            (2, 4),
+            (2, 6),
+            (3, 3),
+            (3, 4),
+            (3, 5),
+            (4, 2),
+            (4, 3),
+            (4, 5),
+            (4, 6),
+            (4, 7),
+            (5, 3),
+            (5, 4),
+            (5, 5),
+            (6, 2),
+            (6, 4),
+            (6, 6),
+            (7, 1),
+            (7, 4),
+            (7, 7),
         ]
 
         actual_moves = main.list_valid_move(board, (4, 4))
