@@ -1,20 +1,24 @@
 import ttkbootstrap as tk
+import engine
 
 
-def build_app() -> tk.Window:
+# TODO:Légal? start game
+def build_app(start_game) -> tk.Window:
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
-    build_top_frame(root)
+    build_top_frame(root, start_game)
     build_checkerboard(root)
     # build_bottom_frame(root)
     root.position_center()
+    # TODO demander comment faire pour une suele fenêtre
     return root
 
 
-def build_top_frame(parent):
+def build_top_frame(parent, start_game):
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="x", expand=False)
+    # TODO main
 
-    label = tk.Button(frame, text="Jouer", style="sucess")
+    label = tk.Button(frame, text="Jouer", style="sucess", command=start_game)
     label.pack(pady=2)
 
 
@@ -40,14 +44,6 @@ def draw_grid():
                 canvas.create_rectangle(
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
-    draw_rook(1, 1, "black")
-    draw_pawn(1, 2, "black")
-    draw_bihsop(1, 3, "black")
-    draw_knight(1, 4, "black")
-    draw_rook(2, 1, "snow")
-    draw_pawn(2, 2, "snow")
-    draw_bihsop(2, 3, "snow")
-    draw_knight(2, 4, "snow")
 
 
 def draw_knight(x, y, color):
@@ -132,4 +128,4 @@ def draw_bihsop(x, y, color):
 
 
 if __name__ == "__main__":
-    build_app().mainloop()
+    pass
