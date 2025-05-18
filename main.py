@@ -82,14 +82,13 @@ def list_valid_move(board, cell) -> list:
     piece_color = get_piece(cell)[1]
     move_list = []
     for move in PIECES[piece_type]["mooves"]:
+        actual_position = cell
         if PIECES[piece_type]["repeat"]:
-            actual_position = cell
             while True:
-                # ptet + joli de faire 2 var actu_pos + move0 +mov1
                 actualy = actual_position[0] + move[0]
                 actualx = actual_position[1] + move[1]
                 if 0 <= actualy <= 7 and 0 <= actualx <= 7:
-                    if get_piece(board[actualy][actualx])[1] != piece_color:
+                    if get_piece((actualy, actualx))[1] != piece_color:
                         move_list.append((actualy, actualx))
                         actual_position = (actualy, actualx)
                         if board[actualy, actualx] != 0:
@@ -97,10 +96,11 @@ def list_valid_move(board, cell) -> list:
                 else:
                     break
         else:
-            if 0 <= place[0] + move[0] <= 9 and 0 <= place[1] + move[1] <= 9:
-                if place[0] + move[0] != team_piece:
-                    possible_moves.append(move)
-    pass
+            actualy = actual_position[0] + move[0]
+            actualx = actual_position[1] + move[1]
+            if 0 <= actualy <= 9 and 0 <= actualx <= 9:
+                if get_piece((actualy, actualx))[1] != piece_color:
+                    move_list.append(move)
 
 
 def moove_piece(board): ...
