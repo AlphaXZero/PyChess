@@ -1,9 +1,8 @@
 import ttkbootstrap as tk
-import engine
 
 
 # TODO:Légal? start game
-def build_app(start_game) -> tk.Window:
+def build_app(start_game=None) -> tk.Window:
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
     build_top_frame(root, start_game)
     build_checkerboard(root)
@@ -44,6 +43,7 @@ def draw_grid():
                 canvas.create_rectangle(
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
+    draw_queen(1, 1, "black")
 
 
 def draw_knight(x, y, color):
@@ -127,5 +127,22 @@ def draw_bihsop(x, y, color):
     canvas.create_oval(x + 23, y + 5, x + 27, y + 10, outline=color, fill=color)
 
 
+def draw_queen(x, y, color):
+    global canvas
+    x, y = x * 50, y * 50
+    # base
+    canvas.create_rectangle(x + 5, y + 40, x + 45, y + 45, outline=color, fill=color)
+    # grand triangle
+    canvas.create_polygon(
+        x + 10, y + 40, x + 40, y + 40, x + 25, y + 20, outline=color, fill=color
+    )
+    # petit triangle
+    canvas.create_polygon(
+        x + 25, y + 22, x + 15, y + 10, x + 35, y + 10, outline=color, fill=color
+    )
+    # rond sommet
+    canvas.create_oval(x + 23, y + 5, x + 27, y + 10, outline=color, fill=color)
+
+
 if __name__ == "__main__":
-    pass
+    build_app().mainloop()

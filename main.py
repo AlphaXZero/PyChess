@@ -19,6 +19,8 @@ def init_game():
                 GUI.draw_pawn(j, i, COLOR_THEME[piece[1]])
             if piece[0] == "knight":
                 GUI.draw_knight(j, i, COLOR_THEME[piece[1]])
+            if piece[0] == "queen":
+                GUI.draw_queen(j, i, COLOR_THEME[piece[1]])
 
 
 if __name__ == "__main__":
