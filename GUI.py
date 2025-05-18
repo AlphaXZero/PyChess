@@ -41,11 +41,11 @@ def draw_grid():
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
     draw_rook(1, 1, "black")
-    draw_knight(1, 2, "black")
+    draw_pawn(1, 2, "black")
     draw_knight(1, 3, "black")
     draw_knight(1, 4, "black")
     draw_rook(2, 1, "snow")
-    draw_knight(2, 2, "snow")
+    draw_pawn(2, 2, "snow")
     draw_knight(2, 3, "snow")
     draw_knight(2, 4, "snow")
 
@@ -94,6 +94,30 @@ def draw_rook(x, y, color):
     canvas.create_rectangle(x + 12, y + 5, x + 17, y + 10, outline=color, fill=color)
     canvas.create_rectangle(x + 22, y + 5, x + 27, y + 10, outline=color, fill=color)
     canvas.create_rectangle(x + 33, y + 5, x + 38, y + 10, outline=color, fill=color)
+
+
+def draw_pawn(x, y, color):
+    global canvas
+    x, y = x * 50, y * 50
+    # base
+    canvas.create_rectangle(x + 10, y + 35, x + 40, y + 45, outline=color, fill=color)
+    # trapeze corps
+    canvas.create_polygon(
+        x + 15,
+        y + 35,
+        x + 20,
+        y + 25,
+        x + 30,
+        y + 25,
+        x + 35,
+        y + 35,
+        outline=color,
+        fill=color,
+    )
+    # rectangle sommet
+    canvas.create_rectangle(x + 17, y + 15, x + 33, y + 25, outline=color, fill=color)
+    # rond sommmet
+    canvas.create_oval(x + 20, y + 5, x + 30, y + 15, outline=color, fill=color)
 
 
 if __name__ == "__main__":
