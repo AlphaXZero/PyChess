@@ -104,7 +104,6 @@ def list_valid_move(board, cell) -> list:
     """
     piece_type = get_piece(board, cell)[0]
     piece_color = get_piece(board, cell)[1]
-    print(piece_type)
     move_list = []
     for move in PIECES[piece_type]["moves"]:
         actual_position = cell
@@ -122,17 +121,12 @@ def list_valid_move(board, cell) -> list:
                 else:
                     break
         else:
-            print(move)
             actualy = actual_position[0] + move[0]
             actualx = actual_position[1] + move[1]
             if 0 <= actualy <= 7 and 0 <= actualx <= 7:
                 if get_piece(board, (actualy, actualx))[1] != piece_color:
                     move_list.append((actualy, actualx))
     return move_list
-
-
-def get_coord():
-    pass
 
 
 def move_piece(board, y, x, new_y, new_x):

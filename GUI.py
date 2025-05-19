@@ -14,6 +14,7 @@ def build_app(start_game=None) -> tk.Window:
     # build_bottom_frame(root)
     root.position_center()
     draw_board()
+    canvas.bind("<Button-1>", get_clicked_cell)
     return root
 
 
@@ -48,6 +49,25 @@ def draw_grid():
                 canvas.create_rectangle(
                     50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
                 )
+
+
+def get_clicked_cell(event):
+    x = event.x // 50
+    y = event.y // 50
+    coords = engine.list_valid_move(board, (y, x))
+    draw_help_circles(coords)
+
+
+def draw_help_circles(coords):
+    for cell in coords:
+        canvas.create_oval(
+            (cell[1] * 50) + 20,
+            (cell[0] * 50) + 20,
+            (cell[1] * 50) + 30,
+            (cell[0] * 50) + 30,
+            outline="blue",
+            width=4,
+        )
 
 
 def draw_knight(x, y, color):
