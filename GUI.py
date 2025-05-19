@@ -1,4 +1,9 @@
 import ttkbootstrap as tk
+import engine
+
+COLOR_THEME = {"white": "seashell3", "black": "black"}
+
+board = engine.board
 
 
 # TODO:Légal? start game
@@ -8,7 +13,8 @@ def build_app(start_game=None) -> tk.Window:
     build_checkerboard(root)
     # build_bottom_frame(root)
     root.position_center()
-    # TODO demander comment faire pour une suele fenêtre
+    draw_board()
+    move_piece(7, 0)
     return root
 
 
@@ -165,6 +171,41 @@ def draw_king(x, y, color):
     canvas.create_rectangle(x + 23, y + 25, x + 27, y + 5, outline=color, fill=color)
     # sommet horizontal
     canvas.create_rectangle(x + 14, y + 12, x + 36, y + 14, outline=color, fill=color)
+
+
+def draw_board():
+    for i, line in enumerate(board):
+        for j, piece in enumerate(line):
+            draw_piece(piece, j, i)
+
+
+def draw_piece(piece, x, y):
+    if piece[0] == "bihsop":
+        draw_bihsop(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "rook":
+        draw_rook(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "pawnb":
+        draw_pawn(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "pawnw":
+        draw_pawn(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "knight":
+        draw_knight(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "queen":
+        draw_queen(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "king":
+        draw_king(x, y, COLOR_THEME[piece[1]])
+
+
+def move_piece(x, y):
+    canvas.create_rectangle(
+        50 * x,
+        50 * y,
+        50 + (50 * x),
+        50 + (50 * y),
+        fill="lightgoldenrod1" if y % 2 == x % 2 else "darkorange4",
+    )
+    # TODO : problème coord
+    draw_piece(engine.get_piece(board, (y, x)), x, y)
 
 
 if __name__ == "__main__":
