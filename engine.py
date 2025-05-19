@@ -133,7 +133,7 @@ def move_piece(board, y, x, new_y, new_x):
     get_piece(board, (y, x))
     possi = list_valid_move(board, (y, x))
     if (new_y, new_x) in possi:
-        board[new_x][new_y], board[y][x] = board[y][x], "00"
+        board[new_y][new_x], board[y][x] = board[y][x], "00"
     else:
         return None
     return board
@@ -146,4 +146,4 @@ if __name__ == "__main__":
     # print(list_valid_move(board, (0, 1)))
     # print_board_highlight(board_void, (4, 4))
     print_board(board)
-    print_board(move_piece(board, 0, 1, 2, 2))
+    print_board(move_piece(board, 1, 0, 2, 0))

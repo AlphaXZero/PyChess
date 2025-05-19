@@ -14,7 +14,7 @@ def build_app(start_game=None) -> tk.Window:
     # build_bottom_frame(root)
     root.position_center()
     draw_board()
-    canvas.bind("<Button-1>", get_clicked_cell)
+    move_piece_GUI()
     return root
 
 
@@ -51,14 +51,35 @@ def draw_grid():
                 )
 
 
-def get_clicked_cell(event):
+current_moove = []
+
+
+def move_piece_GUI():
+    global canvas
+
+    canvas.bind("<Button-1>", get_clicked_cell1)
+
+
+def get_clicked_cell1(event):
+    global current_moove
     x = event.x // 50
     y = event.y // 50
     coords = engine.list_valid_move(board, (y, x))
+    print(coords)
     draw_help_circles(coords)
+    current_moove.append((y, x))
+    if len(current_moove) == 2:
+        show_move(
+            current_moove[0][0],
+            current_moove[0][1],
+            current_moove[1][0],
+            current_moove[1][1],
+        )
+        current_moove = []
 
 
 def draw_help_circles(coords):
+    global canvas
     for cell in coords:
         canvas.create_oval(
             (cell[1] * 50) + 20,
