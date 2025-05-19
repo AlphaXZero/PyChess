@@ -14,7 +14,6 @@ def build_app(start_game=None) -> tk.Window:
     # build_bottom_frame(root)
     root.position_center()
     draw_board()
-    move_piece(7, 0)
     return root
 
 
@@ -196,16 +195,10 @@ def draw_piece(piece, x, y):
         draw_king(x, y, COLOR_THEME[piece[1]])
 
 
-def move_piece(x, y):
-    canvas.create_rectangle(
-        50 * x,
-        50 * y,
-        50 + (50 * x),
-        50 + (50 * y),
-        fill="lightgoldenrod1" if y % 2 == x % 2 else "darkorange4",
-    )
-    # TODO : problème coord
-    draw_piece(engine.get_piece(board, (y, x)), x, y)
+def show_move(y, x, newy, newx):
+    engine.move_piece(board, y, x, newy, newx)
+    draw_grid()
+    draw_board()
 
 
 if __name__ == "__main__":

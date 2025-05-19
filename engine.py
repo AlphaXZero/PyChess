@@ -131,14 +131,17 @@ def list_valid_move(board, cell) -> list:
     return move_list
 
 
+def get_coord():
+    pass
+
+
 def move_piece(board, y, x, new_y, new_x):
     get_piece(board, (y, x))
     possi = list_valid_move(board, (y, x))
-    print(possi)
     if (new_y, new_x) in possi:
         board[new_x][new_y], board[y][x] = board[y][x], "00"
     else:
-        print("illegal move")
+        return None
     return board
 
 
