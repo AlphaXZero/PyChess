@@ -240,3 +240,10 @@ class TestQueen:
 
         actual_moves = engine.list_valid_move(board, (4, 4))
         assert sorted(actual_moves) == sorted(expected_moves)
+
+
+class TestBasicFunc:
+    def test_get_piece(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][1] = ("queen", "w")
+        assert engine.get_piece(board, (4, 1)) == ("queen", "w")

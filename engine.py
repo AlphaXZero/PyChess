@@ -1,6 +1,6 @@
 import colorama as c
 
-
+# TODO: peut pas faire de tuple de 1 ?
 PIECES = {
     "knight": {
         "moves": (
@@ -17,8 +17,8 @@ PIECES = {
     },
     "rook": {"moves": ((1, 0), (0, 1), (-1, 0), (0, -1)), "repeat": True},
     "king": {"moves": ((1, 0), (0, 1), (-1, 0), (0, -1)), "repeat": False},
-    "pawnw": {"moves": (1, 0), "repeat": False},
-    "pawnb": {"moves": (-1, 0), "repeat": False},
+    "pawnw": {"moves": ((1, 0)), "repeat": False},
+    "pawnb": {"moves": ((-1, 0), (0, 0)), "repeat": False},
     "bihsop": {"moves": ((1, 1), (-1, -1), (1, -1), (-1, 1)), "repeat": True},
     "queen": {
         "moves": (
@@ -33,6 +33,7 @@ PIECES = {
         ),
         "repeat": True,
     },
+    "0": {"moves": (), "repeat": False},
 }
 
 
@@ -89,14 +90,21 @@ def print_board_highlight(board, cell):
         print()
 
 
-def get_piece(board, cell):
+def get_piece(board, cell: tuple):
+    """
+    y puis x
+    """
     # TODO : case vide
     return board[cell[0]][cell[1]]
 
 
 def list_valid_move(board, cell) -> list:
+    """
+    y puis x
+    """
     piece_type = get_piece(board, cell)[0]
     piece_color = get_piece(board, cell)[1]
+    print(piece_type)
     move_list = []
     for move in PIECES[piece_type]["moves"]:
         actual_position = cell
@@ -114,6 +122,7 @@ def list_valid_move(board, cell) -> list:
                 else:
                     break
         else:
+            print(move)
             actualy = actual_position[0] + move[0]
             actualx = actual_position[1] + move[1]
             if 0 <= actualy <= 7 and 0 <= actualx <= 7:
@@ -122,12 +131,22 @@ def list_valid_move(board, cell) -> list:
     return move_list
 
 
-def move_piece(board): ...
+def move_piece(board, y, x, new_y, new_x):
+    get_piece(board, (y, x))
+    possi = list_valid_move(board, (y, x))
+    print(possi)
+    if (new_y, new_x) in possi:
+        board[new_x][new_y], board[y][x] = board[y][x], "00"
+    else:
+        print("illegal move")
+    return board
 
 
 if __name__ == "__main__":
-    board_void[4][4] = ("queen", "w")
-    board_void[4][1] = ("queen", "w")
-    board_void[1][1] = ("queen", "b")
-    print(sorted(list_valid_move(board_void, (4, 4))))
-    print_board_highlight(board_void, (4, 4))
+    # board_void[4][4] = ("queen", "w")
+    # board_void[4][1] = ("queen", "w")
+    # print(sorted(list_valid_move(board_void, (4, 4))))
+    # print(list_valid_move(board, (0, 1)))
+    # print_board_highlight(board_void, (4, 4))
+    print_board(board)
+    print_board(move_piece(board, 0, 1, 2, 2))
