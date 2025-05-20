@@ -16,9 +16,21 @@ PIECES = {
         "repeat": False,
     },
     "rook": {"moves": ((1, 0), (0, 1), (-1, 0), (0, -1)), "repeat": True},
-    "king": {"moves": ((1, 0), (0, 1), (-1, 0), (0, -1)), "repeat": False},
-    "pawnw": {"moves": ((1, 0)), "repeat": False},
-    "pawnb": {"moves": ((-1, 0), (0, 0)), "repeat": False},
+    "king": {
+        "moves": (
+            (1, 0),
+            (0, 1),
+            (-1, 0),
+            (0, -1),
+            (1, 1),
+            (-1, -1),
+            (1, -1),
+            (-1, 1),
+        ),
+        "repeat": False,
+    },
+    "pawnw": {"moves": ((-1, 0), (-1, -1), (-1, 1)), "repeat": False, "promote": 0},
+    "pawnb": {"moves": ((1, 0), (1, 1), (1, -1)), "repeat": False, "promote": 7},
     "bihsop": {"moves": ((1, 1), (-1, -1), (1, -1), (-1, 1)), "repeat": True},
     "queen": {
         "moves": (
@@ -105,35 +117,77 @@ def list_valid_move(board, cell) -> list:
     piece_type = get_piece(board, cell)[0]
     piece_color = get_piece(board, cell)[1]
     move_list = []
-    for move in PIECES[piece_type]["moves"]:
-        actual_position = cell
-        if PIECES[piece_type]["repeat"]:
-            while True:
+    if piece_type != "pawnb" and piece_type != "pawnw":
+        for move in PIECES[piece_type]["moves"]:
+            actual_position = cell
+            if PIECES[piece_type]["repeat"]:
+                while True:
+                    actualy = actual_position[0] + move[0]
+                    actualx = actual_position[1] + move[1]
+                    if 0 <= actualy <= 7 and 0 <= actualx <= 7:
+                        if get_piece(board, (actualy, actualx))[1] != piece_color:
+                            move_list.append((actualy, actualx))
+                            actual_position = (actualy, actualx)
+                            # TODO : MOCHE CHANGER !
+                        if board[actualy][actualx] != "00":
+                            break
+                    else:
+                        break
+            else:
                 actualy = actual_position[0] + move[0]
                 actualx = actual_position[1] + move[1]
                 if 0 <= actualy <= 7 and 0 <= actualx <= 7:
                     if get_piece(board, (actualy, actualx))[1] != piece_color:
                         move_list.append((actualy, actualx))
-                        actual_position = (actualy, actualx)
-                        # TODO : MOCHE CHANGER !
-                    if board[actualy][actualx] != "00":
-                        break
-                else:
-                    break
-        else:
-            actualy = actual_position[0] + move[0]
-            actualx = actual_position[1] + move[1]
-            if 0 <= actualy <= 7 and 0 <= actualx <= 7:
-                if get_piece(board, (actualy, actualx))[1] != piece_color:
-                    move_list.append((actualy, actualx))
+    else:
+        return list_valid_move_pawn(board, cell)
     return move_list
 
 
+# TODO :merge les 2 fonctions
+def list_valid_move_pawn(board, cell):
+    piece_type = get_piece(board, cell)[0]
+    piece_color = get_piece(board, cell)[1]
+    move_list = []
+    if piece_color == "white" and cell[0] == 6:
+        if board[cell[0] - 1][cell[1]] == "00":
+            move_list.extend([(cell[0] - 1, cell[1]), (cell[0] - 2, cell[1])])
+    elif piece_color == "black" and cell[0] == 1:
+        if board[cell[0] + 1][cell[1]] == "00":
+            move_list.extend([(cell[0] + 1, cell[1]), (cell[0] + 2, cell[1])])
+    else:
+        for i, move in enumerate(PIECES[piece_type]["moves"]):
+            actualy = cell[0] + move[0]
+            actualx = cell[1] + move[1]
+            if i == 0:
+                if 0 <= actualy <= 7 and 0 <= actualx <= 7:
+                    if get_piece(board, (actualy, actualx)) == "00":
+                        move_list.append((actualy, actualx))
+            else:
+                if 0 <= actualy <= 7 and 0 <= actualx <= 7:
+                    if (
+                        get_piece(board, (actualy, actualx))[1] != piece_color
+                        and get_piece(board, (actualy, actualx)) != "00"
+                    ):
+                        move_list.append((actualy, actualx))
+
+    return move_list
+
+
+def promote_pawn(board2, cell):
+    global board
+    if board2[cell[0]][cell[1]][0] == "pawnb" or board2[cell[0]][cell[1]][0] == "pawnw":
+        if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
+            board[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
+
+
+# TODO bug pion bouge
 def move_piece(board, y, x, new_y, new_x):
     get_piece(board, (y, x))
     possi = list_valid_move(board, (y, x))
     if (new_y, new_x) in possi:
         board[new_y][new_x], board[y][x] = board[y][x], "00"
+        promote_pawn(board, (new_y, new_x))
     else:
         return None
     return board
@@ -145,5 +199,4 @@ if __name__ == "__main__":
     # print(sorted(list_valid_move(board_void, (4, 4))))
     # print(list_valid_move(board, (0, 1)))
     # print_board_highlight(board_void, (4, 4))
-    print_board(board)
-    print_board(move_piece(board, 1, 0, 2, 0))
+    print(list_valid_move(board, (0, 1)))
