@@ -45,8 +45,7 @@ PIECES = {
         ),
         "repeat": True,
     },
-    "0": {"moves": (), "repeat": False},
-}
+    "0": {"moves": (), "repeat": False}}
 
 
 board = [
@@ -78,7 +77,7 @@ board = [
     ],
 ]
 
-board_void = [["00" for _ in range(8)] for _ in range(8)]
+
 
 
 def print_board(board):
@@ -110,11 +109,11 @@ def get_piece(board, cell: tuple):
     return board[cell[0]][cell[1]]
 
 
-def list_valid_move(board, cell) -> list:
+def list_valid_move(board, cell, test_check = None) -> list:
     """
     y puis x
     """
-    piece_type = get_piece(board, cell)[0]
+    piece_type = get_piece(board, cell)[0] if test_check is None else test_check
     piece_color = get_piece(board, cell)[1]
     move_list = []
     if piece_type != "pawnb" and piece_type != "pawnw":
@@ -180,6 +179,20 @@ def promote_pawn(board2, cell):
         if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
             board[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
 
+def check_check(board, cell):
+    cells_where_check = []
+    for piece in PIECES.keys():
+        place_to_check = list_valid_move(board,cell,piece)
+        for i in place_to_check:
+            if board[i[0]][i[1]][0] == piece:
+                cells_where_check.append((i[0],i[1]))
+    return cells_where_check
+
+def find_king(board, color):
+    for i,line in enumerate(board):
+        for j,cell in enumerate(line):
+            if cell[0] == "king" and cell[1]==color:
+                return (i,j)
 
 # TODO bug pion bouge
 def move_piece(board, y, x, new_y, new_x):
@@ -194,9 +207,15 @@ def move_piece(board, y, x, new_y, new_x):
 
 
 if __name__ == "__main__":
-    # board_void[4][4] = ("queen", "w")
+
     # board_void[4][1] = ("queen", "w")
     # print(sorted(list_valid_move(board_void, (4, 4))))
     # print(list_valid_move(board, (0, 1)))
-    # print_board_highlight(board_void, (4, 4))
-    print(list_valid_move(board, (0, 1)))
+    board_void = [["00" for _ in range(8)] for _ in range(8)]
+    board_void[4][4] = ("queen", "black")
+    board_void[2][3] = ("knight","white")
+    print_board_highlight(board_void, (4, 4))
+    print(list_valid_move(board, (4, 4)))
+    print(check_check(board_void,(4,4)))
+    print("fin")
+    print(find_king(board,"black"))

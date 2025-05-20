@@ -65,7 +65,6 @@ def get_clicked_cell1(event):
     x = event.x // 50
     y = event.y // 50
     coords = engine.list_valid_move(board, (y, x))
-    print(coords)
     draw_help_circles(coords)
     current_moove.append((y, x))
     if len(current_moove) == 2:
@@ -76,6 +75,31 @@ def get_clicked_cell1(event):
             current_moove[1][1],
         )
         current_moove = []
+    check_white = engine.check_check(board,engine.find_king(board, "white"))
+    print(check_white)
+    #TODO:séparer
+    for i in check_white:
+        draw_warn_circles(i)
+
+    check_black = engine.check_check(board,engine.find_king(board, "black"))
+    print(check_black)
+    #TODO:séparer + pion bug pour roi blanc 
+    for i in check_black:
+        draw_warn_circles(i)
+
+
+def draw_warn_circles(cell):
+    global canvas
+
+    canvas.create_oval(
+        (cell[1] * 50) + 3,
+        (cell[0] * 50) + 3,
+        (cell[1] * 50) + 47,
+        (cell[0] * 50) + 47,
+        outline="orange",
+        width=4,
+    )
+
 
 
 def draw_help_circles(coords):
