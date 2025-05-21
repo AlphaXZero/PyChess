@@ -242,6 +242,104 @@ class TestQueen:
         assert sorted(actual_moves) == sorted(expected_moves)
 
 
+class TestPawn:
+    def test_pawnb_basic(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[2][3] = ("pawnb", "black")
+        actual_moves = engine.list_valid_move(board, (2, 3))
+        expected_moves = [(3, 3)]
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_pawnw_basic(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[2][3] = ("pawnw", "white")
+        actual_moves = engine.list_valid_move(board, (2, 3))
+        expected_moves = [(1, 3)]
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_pawnb_never_moved(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[1][4] = ("pawnb", "black")
+        actual_moves = engine.list_valid_move(board, (1, 4))
+        expected_moves = [(2, 4), (3, 4)]
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_pawnw_never_moved(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[6][4] = ("pawnw", "white")
+        actual_moves = engine.list_valid_move(board, (6, 4))
+        expected_moves = [(5, 4), (4, 4)]
+        assert sorted(actual_moves) == sorted(expected_moves)
+
+    def test_pawnw_promote(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[1][4] = ("pawnw", "white")
+        engine.move_piece(board, 1, 4, 0, 4)
+        assert board[0][4] == ("queen", "white")
+
+    def test_pawnb_promote(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[6][4] = ("pawnb", "black")
+        engine.move_piece(board, 6, 4, 7, 4)
+        assert board[7][4] == ("queen", "black")
+
+
+class TestMovePiece:
+    def test_valid_rook_move(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "white")
+        result = engine.move_piece(board, 4, 4, 4, 7)
+        assert result[4][7] == ("rook", "white")
+        assert result[4][4] == "00"
+
+    def test_invalid_rook_move_diagonal(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "white")
+        result = engine.move_piece(board, 4, 4, 6, 6)
+        assert result == None
+
+    def test_valid_knight_move(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("knight", "white")
+        result = engine.move_piece(board, 4, 4, 6, 5)
+        assert result[6][5] == ("knight", "white")
+        assert result[4][4] == "00"
+
+    def test_invalid_knight_move(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("knight", "white")
+        result = engine.move_piece(board, 4, 4, 5, 5)
+        assert result == None
+
+    def test_pawn_initial_double_move(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[6][4] = ("pawnw", "white")
+        result = engine.move_piece(board, 6, 4, 4, 4)
+        assert result[4][4] == ("pawnw", "white")
+        assert result[6][4] == "00"
+
+    def test_pawn_promotion(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[1][0] = ("pawnw", "white")
+        engine.move_piece(board, 1, 0, 0, 0)
+        assert engine.get_piece(board, (0, 0)) == ("queen", "white")
+
+    def test_cannot_move_on_own_piece(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "white")
+        board[4][6] = ("knight", "white")
+        result = engine.move_piece(board, 4, 4, 4, 6)
+        assert result == None
+
+    def test_capture_opponent(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("rook", "white")
+        board[4][7] = ("knight", "black")
+        result = engine.move_piece(board, 4, 4, 4, 7)
+        assert result[4][7] == ("rook", "white")
+        assert result[4][4] == "00"
+
+
 class TestBasicFunc:
     def test_get_piece(self):
         board = [["00" for _ in range(8)] for _ in range(8)]

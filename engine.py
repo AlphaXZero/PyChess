@@ -174,10 +174,9 @@ def list_valid_move_pawn(board, cell):
 
 
 def promote_pawn(board2, cell):
-    global board
     if board2[cell[0]][cell[1]][0] == "pawnb" or board2[cell[0]][cell[1]][0] == "pawnw":
         if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
-            board[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
+            board2[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
 
 def check_check(board, cell):
     cells_where_check = []
@@ -211,11 +210,16 @@ if __name__ == "__main__":
     # board_void[4][1] = ("queen", "w")
     # print(sorted(list_valid_move(board_void, (4, 4))))
     # print(list_valid_move(board, (0, 1)))
-    board_void = [["00" for _ in range(8)] for _ in range(8)]
-    board_void[4][4] = ("queen", "black")
-    board_void[2][3] = ("knight","white")
-    print_board_highlight(board_void, (4, 4))
-    print(list_valid_move(board, (4, 4)))
-    print(check_check(board_void,(4,4)))
-    print("fin")
-    print(find_king(board,"black"))
+    # board_void = [["00" for _ in range(8)] for _ in range(8)]
+    # board_void[4][4] = ("queen", "black")
+    # board_void[2][3] = ("knight","white")
+    # print_board_highlight(board, (1, 4))
+    # print(list_valid_move(board, (6, 4)))
+    # print(check_check(board_void,(4,4)))
+    # print("fin")
+    # print(find_king(board,"black"))
+    empty_board = [["00" for _ in range(8)] for _ in range(8)]
+    empty_board[6][4] = ("pawnw", "white")
+    result = move_piece(empty_board, 6, 4, 4, 4)
+    result[4][4] == ("pawnw" == "white")
+    result[6][4] == "00"
