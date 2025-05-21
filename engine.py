@@ -177,7 +177,7 @@ def promote_pawn(board2, cell):
     if board2[cell[0]][cell[1]][0] == "pawnb" or board2[cell[0]][cell[1]][0] == "pawnw":
         if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
             board2[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
-
+#TODO : pions bug
 def check_check(board, cell):
     cells_where_check = []
     for piece in PIECES.keys():
@@ -218,8 +218,10 @@ if __name__ == "__main__":
     # print(check_check(board_void,(4,4)))
     # print("fin")
     # print(find_king(board,"black"))
-    empty_board = [["00" for _ in range(8)] for _ in range(8)]
-    empty_board[6][4] = ("pawnw", "white")
-    result = move_piece(empty_board, 6, 4, 4, 4)
-    result[4][4] == ("pawnw" == "white")
-    result[6][4] == "00"
+
+    board = [["00" for _ in range(8)] for _ in range(8)]
+    board[4][4] = ("king", "white")
+    board[3][4] = ("pawnb", "black")  # Ne peut pas capturer droit devant
+    result = check_check(board, (4, 4))
+    print_board(board)
+

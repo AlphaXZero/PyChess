@@ -354,6 +354,166 @@ class TestFindKing:
         board = [["00" for _ in range(8)] for _ in range(8)]
         assert engine.find_king(board, "white") is None
 
+class TestCheckCheck:
+    def test_check_by_rook(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[0][0] = ("king", "black")
+        board[0][7] = ("rook", "white")
+
+        result = engine.check_check(board, (0, 0))
+        assert (0, 7) in result
+        assert len(result) == 1
+
+    def test_check_by_bishop(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[2][2] = ("king", "black")
+        board[0][0] = ("bihsop", "white")  # orthographe gardée comme dans ton code
+
+        result = engine.check_check(board, (2, 2))
+        assert (0, 0) in result
+        assert len(result) == 1
+
+    def test_check_by_queen(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[4][7] = ("queen", "white")
+
+        result = engine.check_check(board, (4, 4))
+        assert (4, 7) in result
+        assert len(result) == 1
+
+    def test_check_by_knight(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[2][5] = ("knight", "black")
+
+        result = engine.check_check(board, (4, 4))
+        assert (2, 5) in result
+        assert len(result) == 1
+
+    def test_no_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[0][0] = ("rook", "black")  # Pas en ligne directe
+
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_double_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[4][0] = ("rook", "black")
+        board[7][7] = ("bihsop", "black")
+
+        result = engine.check_check(board, (4, 4))
+        assert (4, 0) in result
+        assert (7, 7) in result
+        assert len(result) == 2
+    def test_white_pawn_checking_black_king_diagonal(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[5][3] = ("pawnw", "white")  # Peut capturer en diagonale
+
+        result = engine.check_check(board, (4, 4))
+        assert (5, 3) in result
+        assert len(result) == 1
+
+    def test_white_pawn_not_checking_black_king_forward(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[5][4] = ("pawnw", "white")  # Ne peut pas capturer droit devant
+
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_black_pawn_checking_white_king_diagonal(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[3][3] = ("pawnb", "black")  # Peut capturer en diagonale
+
+        result = engine.check_check(board, (4, 4))
+        assert (3, 3) in result
+        assert len(result) == 1
+
+    def test_black_pawn_not_checking_white_king_forward(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[3][4] = ("pawnb", "black")  # Ne peut pas capturer droit devant
+
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+    def test_white_pawn_diagonal_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[5][3] = ("pawnw", "white")  # attaque diagonale
+        result = engine.check_check(board, (4, 4))
+        assert (5, 3) in result
+
+    def test_black_pawn_diagonal_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[3][3] = ("pawnb", "black")  # attaque diagonale
+        result = engine.check_check(board, (4, 4))
+        assert (3, 3) in result
+
+    # ❌ Cas incorrects — pas de mise en échec
+    def test_white_pawn_behind_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[3][4] = ("pawnw", "white")  # derrière le roi
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_black_pawn_behind_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[5][4] = ("pawnb", "black")  # derrière le roi
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_white_pawn_sideways_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[4][5] = ("pawnw", "white")  # à côté, mais pas en diagonale
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_black_pawn_sideways_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[4][3] = ("pawnb", "black")  # à côté, mais pas en diagonale
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_white_pawn_forward_but_blocked(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "black")
+        board[5][4] = ("pawnw", "white")  # juste devant — mais ne peut pas capturer droit
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    def test_black_pawn_forward_but_blocked(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[4][4] = ("king", "white")
+        board[3][4] = ("pawnb", "black")  # juste devant — ne capture pas droit
+        result = engine.check_check(board, (4, 4))
+        assert result == []
+
+    # 🔁 Cas symétriques et bords de plateau
+    def test_white_pawn_on_edge_can_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[0][0] = ("king", "black")
+        board[1][1] = ("pawnw", "white")  # diagonale vers coin
+        result = engine.check_check(board, (0, 0))
+        assert (1, 1) in result
+
+    def test_black_pawn_on_edge_can_check(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[7][7] = ("king", "white")
+        board[6][6] = ("pawnb", "black")  # diagonale vers coin
+        result = engine.check_check(board, (7, 7))
+        assert (6, 6) in result
+
 
 class TestBasicFunc:
     def test_get_piece(self):
