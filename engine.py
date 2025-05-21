@@ -197,14 +197,16 @@ def find_king(board, color):
 
 
 # TODO bug pion bouge
-def move_piece(board, y, x, new_y, new_x):
+def move_piece(board, y, x, new_y, new_x, col):
     get_piece(board, (y, x))
+    if board[y][x][1] != col:
+        return -1
     possi = list_valid_move(board, (y, x))
     if (new_y, new_x) in possi:
         board[new_y][new_x], board[y][x] = board[y][x], "00"
         promote_pawn(board, (new_y, new_x))
     else:
-        return None
+        return -1
     return board
 
 

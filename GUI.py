@@ -5,6 +5,9 @@ COLOR_THEME = {"white": "seashell3", "black": "black"}
 
 board = engine.board
 
+color = ["white", "black"]
+GAME_TURN = 0
+
 
 def build_app(start_game=None) -> tk.Window:
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
@@ -71,7 +74,9 @@ def get_clicked_cell1(event):
     y = event.y // 50
 
     coords = engine.list_valid_move(board, (y, x))
-    draw_help_circles(coords)
+    # remonter la vrif ici
+    if board[y][x][1] == color[(GAME_TURN % 2)]:
+        draw_help_circles(coords)
     current_moove.append((y, x))
     if len(current_moove) == 2:
         show_move(
@@ -79,6 +84,7 @@ def get_clicked_cell1(event):
             current_moove[0][1],
             current_moove[1][0],
             current_moove[1][1],
+            color[GAME_TURN % 2],
         )
         current_moove = []
     check_white = engine.check_check(board, engine.find_king(board, "white"))
@@ -265,8 +271,11 @@ def draw_piece(piece, x, y):
         draw_king(x, y, COLOR_THEME[piece[1]])
 
 
-def show_move(y, x, newy, newx):
-    engine.move_piece(board, y, x, newy, newx)
+def show_move(y, x, newy, newx, col):
+    global GAME_TURN
+    if engine.move_piece(board, y, x, newy, newx, col) != -1:
+        engine.move_piece(board, y, x, newy, newx, col)
+        GAME_TURN += 1
     draw_grid()
     draw_board()
 
