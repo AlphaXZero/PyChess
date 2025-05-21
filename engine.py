@@ -1,6 +1,6 @@
 import colorama as c
 
-# TODO: peut pas faire de tuple de 1 ?
+
 PIECES = {
     "knight": {
         "moves": (
@@ -45,7 +45,8 @@ PIECES = {
         ),
         "repeat": True,
     },
-    "0": {"moves": (), "repeat": False}}
+    "0": {"moves": (), "repeat": False},
+}
 
 
 board = [
@@ -78,8 +79,6 @@ board = [
 ]
 
 
-
-
 def print_board(board):
     for i, line in enumerate(board):
         print(i, end=" ")
@@ -109,7 +108,7 @@ def get_piece(board, cell: tuple):
     return board[cell[0]][cell[1]]
 
 
-def list_valid_move(board, cell, test_check = None) -> list:
+def list_valid_move(board, cell, test_check=None) -> list:
     """
     y puis x
     """
@@ -177,21 +176,25 @@ def promote_pawn(board2, cell):
     if board2[cell[0]][cell[1]][0] == "pawnb" or board2[cell[0]][cell[1]][0] == "pawnw":
         if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
             board2[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
-#TODO : pions bug
+
+
+# TODO : pions bug
 def check_check(board, cell):
     cells_where_check = []
     for piece in PIECES.keys():
-        place_to_check = list_valid_move(board,cell,piece)
+        place_to_check = list_valid_move(board, cell, piece)
         for i in place_to_check:
             if board[i[0]][i[1]][0] == piece:
-                cells_where_check.append((i[0],i[1]))
+                cells_where_check.append((i[0], i[1]))
     return cells_where_check
 
+
 def find_king(board, color):
-    for i,line in enumerate(board):
-        for j,cell in enumerate(line):
-            if cell[0] == "king" and cell[1]==color:
-                return (i,j)
+    for i, line in enumerate(board):
+        for j, cell in enumerate(line):
+            if cell[0] == "king" and cell[1] == color:
+                return (i, j)
+
 
 # TODO bug pion bouge
 def move_piece(board, y, x, new_y, new_x):
@@ -206,7 +209,6 @@ def move_piece(board, y, x, new_y, new_x):
 
 
 if __name__ == "__main__":
-
     # board_void[4][1] = ("queen", "w")
     # print(sorted(list_valid_move(board_void, (4, 4))))
     # print(list_valid_move(board, (0, 1)))
@@ -224,4 +226,3 @@ if __name__ == "__main__":
     board[3][4] = ("pawnb", "black")  # Ne peut pas capturer droit devant
     result = check_check(board, (4, 4))
     print_board(board)
-

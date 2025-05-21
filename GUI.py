@@ -6,12 +6,10 @@ COLOR_THEME = {"white": "seashell3", "black": "black"}
 board = engine.board
 
 
-# TODO:Légal? start game
 def build_app(start_game=None) -> tk.Window:
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
     build_top_frame(root, start_game)
     build_checkerboard(root)
-    # build_bottom_frame(root)
     root.position_center()
     draw_board()
     move_piece_GUI()
@@ -21,8 +19,6 @@ def build_app(start_game=None) -> tk.Window:
 def build_top_frame(parent, start_game):
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="x", expand=False)
-    # TODO main
-
     label = tk.Button(frame, text="Jouer", style="sucess", command=start_game)
     label.pack(pady=2)
 
@@ -61,9 +57,19 @@ def move_piece_GUI():
 
 
 def get_clicked_cell1(event):
+    """
+    get clicked cell
+
+    :param word: word to decode
+    :type word: str
+
+    :return decoded: word
+    :rtype: str
+    """
     global current_moove
     x = event.x // 50
     y = event.y // 50
+
     coords = engine.list_valid_move(board, (y, x))
     draw_help_circles(coords)
     current_moove.append((y, x))
@@ -75,15 +81,15 @@ def get_clicked_cell1(event):
             current_moove[1][1],
         )
         current_moove = []
-    check_white = engine.check_check(board,engine.find_king(board, "white"))
+    check_white = engine.check_check(board, engine.find_king(board, "white"))
     print(check_white)
-    #TODO:séparer
+    # TODO:séparer
     for i in check_white:
         draw_warn_circles(i)
 
-    check_black = engine.check_check(board,engine.find_king(board, "black"))
+    check_black = engine.check_check(board, engine.find_king(board, "black"))
     print(check_black)
-    #TODO:séparer + pion bug pour roi blanc 
+    # TODO:séparer + pion bug pour roi blanc
     for i in check_black:
         draw_warn_circles(i)
 
@@ -99,7 +105,6 @@ def draw_warn_circles(cell):
         outline="orange",
         width=4,
     )
-
 
 
 def draw_help_circles(coords):

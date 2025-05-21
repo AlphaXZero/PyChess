@@ -296,7 +296,7 @@ class TestMovePiece:
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "white")
         result = engine.move_piece(board, 4, 4, 6, 6)
-        assert result == None
+        assert result is None
 
     def test_valid_knight_move(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
@@ -309,7 +309,7 @@ class TestMovePiece:
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("knight", "white")
         result = engine.move_piece(board, 4, 4, 5, 5)
-        assert result == None
+        assert result is None
 
     def test_pawn_initial_double_move(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
@@ -329,7 +329,7 @@ class TestMovePiece:
         board[4][4] = ("rook", "white")
         board[4][6] = ("knight", "white")
         result = engine.move_piece(board, 4, 4, 4, 6)
-        assert result == None
+        assert result is None
 
     def test_capture_opponent(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
@@ -338,6 +338,7 @@ class TestMovePiece:
         result = engine.move_piece(board, 4, 4, 4, 7)
         assert result[4][7] == ("rook", "white")
         assert result[4][4] == "00"
+
 
 class TestFindKing:
     def test_find_white_king(self):
@@ -353,6 +354,7 @@ class TestFindKing:
     def test_find_king_not_found(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         assert engine.find_king(board, "white") is None
+
 
 class TestCheckCheck:
     def test_check_by_rook(self):
@@ -409,6 +411,7 @@ class TestCheckCheck:
         assert (4, 0) in result
         assert (7, 7) in result
         assert len(result) == 2
+
     def test_white_pawn_checking_black_king_diagonal(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
@@ -442,6 +445,7 @@ class TestCheckCheck:
 
         result = engine.check_check(board, (4, 4))
         assert result == []
+
     def test_white_pawn_diagonal_check(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
@@ -488,7 +492,10 @@ class TestCheckCheck:
     def test_white_pawn_forward_but_blocked(self):
         board = [["00" for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
-        board[5][4] = ("pawnw", "white")  # juste devant — mais ne peut pas capturer droit
+        board[5][4] = (
+            "pawnw",
+            "white",
+        )  # juste devant — mais ne peut pas capturer droit
         result = engine.check_check(board, (4, 4))
         assert result == []
 
