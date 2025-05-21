@@ -339,6 +339,21 @@ class TestMovePiece:
         assert result[4][7] == ("rook", "white")
         assert result[4][4] == "00"
 
+class TestFindKing:
+    def test_find_white_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[7][4] = ("king", "white")
+        assert engine.find_king(board, "white") == (7, 4)
+
+    def test_find_black_king(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        board[0][4] = ("king", "black")
+        assert engine.find_king(board, "black") == (0, 4)
+
+    def test_find_king_not_found(self):
+        board = [["00" for _ in range(8)] for _ in range(8)]
+        assert engine.find_king(board, "white") is None
+
 
 class TestBasicFunc:
     def test_get_piece(self):
