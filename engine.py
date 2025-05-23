@@ -128,7 +128,6 @@ def list_valid_move(
     return valid_moves
 
 
-# TODO :merge les 2 fonctions
 def list_valid_move_pawn(
     board: list[list[tuple[str, str]]],
     y: int,
@@ -149,27 +148,26 @@ def list_valid_move_pawn(
         list[tuple[int, int]]: a list with every cell (y,x) where the pawn can go
     """
     move_list = []
+    bound = 6 if piece_color == "white" else 1
+    direction = 1 if piece_color == "white" else -1
     for i, move in enumerate(PIECES[piece_type]["moves"]):
-        new_y = y + move[0]
-        new_x = x + move[1]
-        if i == 0:
-            if 0 <= new_y <= 7 and 0 <= new_x <= 7:
+        new_y, new_x = y + move[0], x + move[1]
+        if 0 <= new_y <= 7 and 0 <= new_x <= 7:
+            if i == 0:
                 if board[new_y][new_x] == ("0", "0"):
                     move_list.append((new_y, new_x))
-        else:
-            if 0 <= new_y <= 7 and 0 <= new_x <= 7:
+                    if (
+                        new_y < 7
+                        and board[y + (-2 * direction)][x] == ("0", "0")
+                        and bound == y
+                    ):
+                        move_list.append((y + (-2 * direction), x))
+            else:
                 if board[new_y][new_x][1] != piece_color and board[new_y][new_x] != (
                     "0",
                     "0",
                 ):
                     move_list.append((new_y, new_x))
-    if piece_color == "white" and y == 6:
-        if board[y - 1][x] == ("0", "0") and board[y - 2][x] == ("0", "0"):
-            move_list.append((y - 2, x))
-    elif piece_color == "black" and y == 1:
-        if board[y + 1][x] == ("0", "0") and board[y + 2][x] == ("0", "0"):
-            move_list.append((y + 2, x))
-
     return move_list
 
 
@@ -231,7 +229,6 @@ def find_king(board: list[list[tuple[str, str]]], color: str) -> tuple[int, int]
                 return (i, j)
 
 
-# TODO enlever color
 def move_piece(
     board: list[list[tuple[str, str]]],
     y: int,
