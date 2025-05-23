@@ -3,18 +3,18 @@ import engine
 
 COLOR_THEME = {"white": "seashell3", "black": "black"}
 
-board = engine.board
+current_board = engine.board
 
 color = ["white", "black"]
 GAME_TURN = 0
 text_top = None
 
 
-def build_app(start_game=None) -> tk.Window:
+def build_app() -> tk.Window:
     global text_top
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
     text_top = tk.StringVar()
-    build_top_frame(root, start_game)
+    build_top_frame(root)
     build_checkerboard(root)
     root.position_center()
     draw_board()
@@ -22,16 +22,24 @@ def build_app(start_game=None) -> tk.Window:
     return root
 
 
-def build_top_frame(parent, start_game):
+def restart():
+    global current_board
+    current_board = engine.board
+    draw_grid()
+    draw_board()
+
+
+def build_top_frame(parent):
     global text_top
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="x", expand=False)
-    button = tk.Button(frame, text="Jouer", style="sucess", command=start_game)
+    button = tk.Button(frame, text="Nouvelle Partie", style="sucess", command=restart)
 
     label = tk.Label(frame, text="Game Turn : ", font=("Arial", 14))
     label.pack(side="left", pady=4)
     turn_text = tk.Label(frame, textvariable=text_top, font=("Arial", 14))
     turn_text.pack(side="left", padx=4)
+    button.pack()
     update_turn_lab()
 
 
@@ -87,9 +95,9 @@ def get_clicked_cell1(event):
     x = event.x // 50
     y = event.y // 50
 
-    coords = engine.list_valid_move(board, (y, x))
+    coords = engine.list_valid_move(current_board, (y, x))
     # remonter la vrif ici
-    if board[y][x][1] == color[(GAME_TURN % 2)]:
+    if current_board[y][x][1] == color[(GAME_TURN % 2)]:
         draw_help_circles(coords)
     current_moove.append((y, x))
     if len(current_moove) == 2:
@@ -101,13 +109,17 @@ def get_clicked_cell1(event):
             color[GAME_TURN % 2],
         )
         current_moove = []
-    check_white = engine.check_check(board, engine.find_king(board, "white"))
+    check_white = engine.check_check(
+        current_board, engine.find_king(current_board, "white")
+    )
     print(check_white)
     # TODO:séparer
     for i in check_white:
         draw_warn_circles(i)
 
-    check_black = engine.check_check(board, engine.find_king(board, "black"))
+    check_black = engine.check_check(
+        current_board, engine.find_king(current_board, "black")
+    )
     print(check_black)
     # TODO:séparer + pion bug pour roi blanc
     for i in check_black:
@@ -263,7 +275,7 @@ def draw_king(x, y, color):
 
 
 def draw_board():
-    for i, line in enumerate(board):
+    for i, line in enumerate(current_board):
         for j, piece in enumerate(line):
             draw_piece(piece, j, i)
 
@@ -287,8 +299,8 @@ def draw_piece(piece, x, y):
 
 def show_move(y, x, newy, newx, col):
     global GAME_TURN
-    if engine.move_piece(board, y, x, newy, newx, col) != -1:
-        engine.move_piece(board, y, x, newy, newx, col)
+    if engine.move_piece(current_board, y, x, newy, newx, col) != -1:
+        engine.move_piece(current_board, y, x, newy, newx, col)
         GAME_TURN += 1
         update_turn_lab()
     draw_grid()

@@ -1,5 +1,4 @@
-import colorama as c
-from typing import List, Tuple, Optional
+from typing import Optional
 
 PIECES = {
     "knight": {
@@ -92,15 +91,12 @@ def print_board(board: list[list[tuple[str, str]]]):
         print()
 
 
-# TODO : créer une varible avec list[list[tuplestr,str]] ?
-# TODO bine comme ça ou mieux de faire board,y,x,test_cehck + etsce bien de préciser autant
-# TODO séparer en plus de fonctions ?
 def list_valid_move(
     board: list[list[tuple[str, str]]],
     cell: tuple[int, int],
     specific_piece: Optional[str] = None,
 ) -> list[tuple[int, int]]:
-    """list all valid move for the piece at the given cell
+    """list all valid moves for the piece at the given cell on the board
 
     Args:
         board (list[list[tuple[str, str]]]): game board
@@ -109,36 +105,26 @@ def list_valid_move(
          Defaults to None.
 
     Returns:
-        list[tuple[int, int]]: a list with every cell (y,x) where the piece can go
+        list[tuple[int, int]]: a list with every cells (y,x) where the piece can move to
     """
     y, x = cell
-    piece_type = board[y][x][0] if specific_piece is None else specific_piece
+    piece_type = specific_piece or board[y][x][0]
     piece_color = board[y][x][1]
     valid_moves = []
-    if piece_type != "pawnb" and piece_type != "pawnw":
-        for move in PIECES[piece_type]["moves"]:
-            current_position = cell
-            if PIECES[piece_type]["repeat"]:
-                while True:
-                    # TODO répétitions .
-                    actual_y = current_position[0] + move[0]
-                    actual_x = current_position[1] + move[1]
-                    if 0 <= actual_y <= 7 and 0 <= actual_x <= 7:
-                        if board[actual_y][actual_x][1] != piece_color:
-                            valid_moves.append((actual_y, actual_x))
-                            current_position = (actual_y, actual_x)
-                        if board[actual_y][actual_x] != ("0", "0"):
-                            break
-                    else:
-                        break
-            else:
-                actual_y = current_position[0] + move[0]
-                actual_x = current_position[1] + move[1]
-                if 0 <= actual_y <= 7 and 0 <= actual_x <= 7:
-                    if board[actual_y][actual_x][1] != piece_color:
-                        valid_moves.append((actual_y, actual_x))
-    else:
+    if piece_type in ("pawnb", "pawnw"):
         return list_valid_move_pawn(board, y, x, piece_type, piece_color)
+    repeat = PIECES[piece_type]["repeat"]
+    for dy, dx in PIECES[piece_type]["moves"]:
+        new_y, new_x = y + dy, x + dx
+        while 0 <= new_y <= 7 and 0 <= new_x <= 7:
+            target_piece, target_color = board[new_y][new_x]
+            if target_color == piece_color:
+                break
+            valid_moves.append((new_y, new_x))
+            if target_piece != "0" or not repeat:
+                break
+            new_y += dy
+            new_x += dx
     return valid_moves
 
 
@@ -164,18 +150,19 @@ def list_valid_move_pawn(
     """
     move_list = []
     for i, move in enumerate(PIECES[piece_type]["moves"]):
-        actual_y = y + move[0]
-        actual_x = x + move[1]
+        new_y = y + move[0]
+        new_x = x + move[1]
         if i == 0:
-            if 0 <= actual_y <= 7 and 0 <= actual_x <= 7:
-                if board[actual_y][actual_x] == ("0", "0"):
-                    move_list.append((actual_y, actual_x))
+            if 0 <= new_y <= 7 and 0 <= new_x <= 7:
+                if board[new_y][new_x] == ("0", "0"):
+                    move_list.append((new_y, new_x))
         else:
-            if 0 <= actual_y <= 7 and 0 <= actual_x <= 7:
-                if board[actual_y][actual_x][1] != piece_color and board[actual_y][
-                    actual_x
-                ] != ("0", "0"):
-                    move_list.append((actual_y, actual_x))
+            if 0 <= new_y <= 7 and 0 <= new_x <= 7:
+                if board[new_y][new_x][1] != piece_color and board[new_y][new_x] != (
+                    "0",
+                    "0",
+                ):
+                    move_list.append((new_y, new_x))
     if piece_color == "white" and y == 6:
         if board[y - 1][x] == ("0", "0") and board[y - 2][x] == ("0", "0"):
             move_list.append((y - 2, x))
@@ -186,10 +173,17 @@ def list_valid_move_pawn(
     return move_list
 
 
-def promote_pawn(board2, cell):
-    if board2[cell[0]][cell[1]][0] == "pawnb" or board2[cell[0]][cell[1]][0] == "pawnw":
-        if cell[0] == PIECES[board2[cell[0]][cell[1]][0]]["promote"]:
-            board2[cell[0]][cell[1]] = ("queen", board2[cell[0]][cell[1]][1])
+def promote_pawn(board: list[list[tuple[str, str]]], cell: tuple[int, int]) -> None:
+    """check if a pawn is promotabe then transform the cell in the board with queen
+
+    Args:
+        board (list[list[tuple[str, str]]]): game board
+        cell (tuple[int, int]): coordinates of the piece (y,x)
+    """
+    y, x = cell
+    if board[y][x][0][0:4] == "pawn":
+        if y == PIECES[board[y][x][0]]["promote"]:
+            board[y][x] = ("queen", board[y][x][1])
 
 
 def check_check(
@@ -215,7 +209,6 @@ def check_check(
             piece, color = board[i][j]
             if color != opponent_color or piece == "0":
                 continue
-            # Liste des mouvements possibles pour cette pièce
             possible_moves = list_valid_move(board, (i, j))
             if cell in possible_moves:
                 checking_cells.append((i, j))

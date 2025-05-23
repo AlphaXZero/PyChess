@@ -520,3 +520,58 @@ class TestCheckCheck:
         board[6][6] = ("pawnb", "black")  # diagonale vers coin
         result = engine.check_check(board, (7, 7))
         assert (6, 6) in result
+
+    def test_en_passant_capture_by_white(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[3][4] = ("pawnw", "white")  # pion blanc prêt à capturer
+        board[3][5] = ("pawnb", "black")  # pion noir qui vient de bouger de 2 cases
+
+        # Simuler l'historique de mouvement si nécessaire pour autoriser en passant
+        # Ex: engine.last_move = ((1,5), (3,5))
+
+        result = engine.move_piece(board, 3, 4, 2, 5, "white", en_passant_target=(3, 5))
+        assert result[2][5] == ("pawnw", "white")
+        assert result[3][5] == ("0", "0")  # pion noir capturé
+        assert result[3][4] == ("0", "0")
+
+    def test_en_passant_invalid_after_delay(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[3][4] = ("pawnw", "white")
+        board[3][5] = ("pawnb", "black")
+
+        # Pas d’en passant autorisé ici (trop tard)
+        result = engine.move_piece(board, 3, 4, 2, 5, "white", en_passant_target=None)
+        assert result == -1
+
+    def test_white_pawn_promotion_to_queen(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[1][0] = ("pawnw", "white")
+
+        result = engine.move_piece(board, 1, 0, 0, 0, "white")
+        assert result[0][0] == ("queen", "white")
+        assert result[1][0] == ("0", "0")
+
+    def test_pawn_blocked_forward(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[6][3] = ("pawnw", "white")
+        board[5][3] = ("rook", "black")  # une pièce bloque le pion
+
+        result = engine.move_piece(board, 6, 3, 5, 3, "white")
+        assert result == -1
+
+    def test_pawn_cannot_capture_forward(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[6][3] = ("pawnw", "white")
+        board[5][3] = ("rook", "black")  # pièce ennemie en avant
+
+        result = engine.move_piece(board, 6, 3, 5, 3, "white")
+        assert result == -1  # capture non autorisée vers l’avant
+
+    def test_pawn_capture_diagonal(self):
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+        board[6][3] = ("pawnw", "white")
+        board[5][4] = ("rook", "black")
+
+        result = engine.move_piece(board, 6, 3, 5, 4, "white")
+        assert result[5][4] == ("pawnw", "white")
+        assert result[6][3] == ("0", "0")
