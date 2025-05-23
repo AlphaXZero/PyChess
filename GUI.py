@@ -7,10 +7,13 @@ board = engine.board
 
 color = ["white", "black"]
 GAME_TURN = 0
+text_top = None
 
 
 def build_app(start_game=None) -> tk.Window:
+    global text_top
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
+    text_top = tk.StringVar()
     build_top_frame(root, start_game)
     build_checkerboard(root)
     root.position_center()
@@ -20,10 +23,21 @@ def build_app(start_game=None) -> tk.Window:
 
 
 def build_top_frame(parent, start_game):
+    global text_top
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="x", expand=False)
-    label = tk.Button(frame, text="Jouer", style="sucess", command=start_game)
-    label.pack(pady=2)
+    button = tk.Button(frame, text="Jouer", style="sucess", command=start_game)
+
+    label = tk.Label(frame, text="Game Turn : ", font=("Arial", 14))
+    label.pack(side="left", pady=4)
+    turn_text = tk.Label(frame, textvariable=text_top, font=("Arial", 14))
+    turn_text.pack(side="left", padx=4)
+    update_turn_lab()
+
+
+def update_turn_lab():
+    global text_top
+    text_top.set(f"{color[(GAME_TURN % 2)]}")
 
 
 def build_checkerboard(parent):
@@ -61,13 +75,13 @@ def move_piece_GUI():
 
 def get_clicked_cell1(event):
     """
-    get clicked cell
+        get clicked cell
+    comment break
+        :param word: word to decode
+        :type word: str
 
-    :param word: word to decode
-    :type word: str
-
-    :return decoded: word
-    :rtype: str
+        :return decoded: word
+        :rtype: str
     """
     global current_moove
     x = event.x // 50
@@ -276,6 +290,7 @@ def show_move(y, x, newy, newx, col):
     if engine.move_piece(board, y, x, newy, newx, col) != -1:
         engine.move_piece(board, y, x, newy, newx, col)
         GAME_TURN += 1
+        update_turn_lab()
     draw_grid()
     draw_board()
 

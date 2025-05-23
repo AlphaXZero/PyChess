@@ -9,9 +9,9 @@ import pytest
 
 
 # j'utilise une class faire des catégories pour mes tests mais on peut enlever si c'est vraiment interdit les objets (:
-class TestKnight:
+class TestListValidMoveKnight:
     def test_knight_moves_center(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[3][3] = ("knight", "b")
         moves = engine.list_valid_move(board, (3, 3))
         expected_moves = [
@@ -27,7 +27,7 @@ class TestKnight:
         assert sorted(moves) == sorted(expected_moves)
 
     def test_knight_blocked_by_ally(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[3][3] = ("knight", "w")
         board[5][4] = ("pawnw", "w")
         moves = engine.list_valid_move(board, (3, 3))
@@ -35,7 +35,7 @@ class TestKnight:
         assert sorted(moves) == sorted(expected_moves)
 
     def test_knight_can_capture_enemy(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[3][3] = ("knight", "w")
         board[5][4] = ("pawnb", "b")
         moves = engine.list_valid_move(board, (3, 3))
@@ -52,23 +52,23 @@ class TestKnight:
         assert sorted(moves) == sorted(expected_moves)
 
     def test_knight_outbound(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[0][0] = ("knight", "w")
         moves = engine.list_valid_move(board, (0, 0))
         expected_moves = [(2, 1), (1, 2)]
         assert sorted(moves) == sorted(expected_moves)
 
     def test_knight_outbound2(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[6][7] = ("knight", "w")
         moves = engine.list_valid_move(board, (6, 7))
         expected_moves = [(4, 6), (7, 5), (5, 5)]
         assert sorted(moves) == sorted(expected_moves)
 
 
-class TestRook:
+class TestListValidMoveRook:
     def test_rook_center(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "w")
         moves = engine.list_valid_move(board, (4, 4))
         expected_moves = [
@@ -90,7 +90,7 @@ class TestRook:
         assert sorted(moves) == sorted(expected_moves)
 
     def test_rook_blocked_by_allies(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "w")
         board[4][6] = ("pawnw", "w")
         board[2][4] = ("pawnw", "w")
@@ -110,7 +110,7 @@ class TestRook:
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_rook_can_capture_enemies(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "w")
         board[4][6] = ("pawnb", "b")
         board[1][4] = ("queen", "b")
@@ -134,9 +134,9 @@ class TestRook:
         assert sorted(actual_moves) == sorted(expected_moves)
 
 
-class TestQueen:
+class TestListValidMoveQueen:
     def test_queen_center_clear(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("queen", "w")
         expected_moves = [
             (0, 0),
@@ -172,7 +172,7 @@ class TestQueen:
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_queen_blocked_by_allies(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("queen", "w")
         board[4][1] = ("pawnw", "w")
         board[1][1] = ("queen", "w")
@@ -206,7 +206,7 @@ class TestQueen:
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_queen_can_capture_enemies(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("queen", "w")
         board[4][1] = ("queen", "w")
         board[1][1] = ("queen", "b")
@@ -242,123 +242,123 @@ class TestQueen:
         assert sorted(actual_moves) == sorted(expected_moves)
 
 
-class TestPawn:
+class TestListValidMovePawn:
     def test_pawnb_basic(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[2][3] = ("pawnb", "black")
         actual_moves = engine.list_valid_move(board, (2, 3))
         expected_moves = [(3, 3)]
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_pawnw_basic(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[2][3] = ("pawnw", "white")
         actual_moves = engine.list_valid_move(board, (2, 3))
         expected_moves = [(1, 3)]
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_pawnb_never_moved(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[1][4] = ("pawnb", "black")
         actual_moves = engine.list_valid_move(board, (1, 4))
         expected_moves = [(2, 4), (3, 4)]
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_pawnw_never_moved(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[6][4] = ("pawnw", "white")
         actual_moves = engine.list_valid_move(board, (6, 4))
         expected_moves = [(5, 4), (4, 4)]
         assert sorted(actual_moves) == sorted(expected_moves)
 
     def test_pawnw_promote(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[1][4] = ("pawnw", "white")
-        engine.move_piece(board, 1, 4, 0, 4)
+        engine.move_piece(board, 1, 4, 0, 4, "white")
         assert board[0][4] == ("queen", "white")
 
     def test_pawnb_promote(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[6][4] = ("pawnb", "black")
-        engine.move_piece(board, 6, 4, 7, 4)
+        engine.move_piece(board, 6, 4, 7, 4, "black")
         assert board[7][4] == ("queen", "black")
 
 
 class TestMovePiece:
     def test_valid_rook_move(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "white")
-        result = engine.move_piece(board, 4, 4, 4, 7)
+        result = engine.move_piece(board, 4, 4, 4, 7, "white")
         assert result[4][7] == ("rook", "white")
-        assert result[4][4] == "00"
+        assert result[4][4] == ("0", "0")
 
     def test_invalid_rook_move_diagonal(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "white")
-        result = engine.move_piece(board, 4, 4, 6, 6)
-        assert result is None
+        result = engine.move_piece(board, 4, 4, 6, 6, "white")
+        assert result == -1
 
     def test_valid_knight_move(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("knight", "white")
-        result = engine.move_piece(board, 4, 4, 6, 5)
+        result = engine.move_piece(board, 4, 4, 6, 5, "white")
         assert result[6][5] == ("knight", "white")
-        assert result[4][4] == "00"
+        assert result[4][4] == ("0", "0")
 
     def test_invalid_knight_move(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("knight", "white")
-        result = engine.move_piece(board, 4, 4, 5, 5)
-        assert result is None
+        result = engine.move_piece(board, 4, 4, 5, 5, "white")
+        assert result == -1
 
     def test_pawn_initial_double_move(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[6][4] = ("pawnw", "white")
-        result = engine.move_piece(board, 6, 4, 4, 4)
+        result = engine.move_piece(board, 6, 4, 4, 4, "white")
         assert result[4][4] == ("pawnw", "white")
-        assert result[6][4] == "00"
+        assert result[6][4] == ("0", "0")
 
     def test_pawn_promotion(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[1][0] = ("pawnw", "white")
-        engine.move_piece(board, 1, 0, 0, 0)
-        assert engine.get_piece(board, (0, 0)) == ("queen", "white")
+        engine.move_piece(board, 1, 0, 0, 0, "white")
+        assert board[0][0] == ("queen", "white")
 
     def test_cannot_move_on_own_piece(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "white")
         board[4][6] = ("knight", "white")
-        result = engine.move_piece(board, 4, 4, 4, 6)
-        assert result is None
+        result = engine.move_piece(board, 4, 4, 4, 6, "white")
+        assert result == -1
 
     def test_capture_opponent(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("rook", "white")
         board[4][7] = ("knight", "black")
-        result = engine.move_piece(board, 4, 4, 4, 7)
+        result = engine.move_piece(board, 4, 4, 4, 7, "white")
         assert result[4][7] == ("rook", "white")
-        assert result[4][4] == "00"
+        assert result[4][4] == ("0", "0")
 
 
 class TestFindKing:
     def test_find_white_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[7][4] = ("king", "white")
         assert engine.find_king(board, "white") == (7, 4)
 
     def test_find_black_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[0][4] = ("king", "black")
         assert engine.find_king(board, "black") == (0, 4)
 
     def test_find_king_not_found(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         assert engine.find_king(board, "white") is None
 
 
 class TestCheckCheck:
     def test_check_by_rook(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[0][0] = ("king", "black")
         board[0][7] = ("rook", "white")
 
@@ -367,7 +367,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_check_by_bishop(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[2][2] = ("king", "black")
         board[0][0] = ("bihsop", "white")  # orthographe gardée comme dans ton code
 
@@ -376,7 +376,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_check_by_queen(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[4][7] = ("queen", "white")
 
@@ -385,7 +385,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_check_by_knight(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[2][5] = ("knight", "black")
 
@@ -394,7 +394,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_no_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[0][0] = ("rook", "black")  # Pas en ligne directe
 
@@ -402,7 +402,7 @@ class TestCheckCheck:
         assert result == []
 
     def test_double_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[4][0] = ("rook", "black")
         board[7][7] = ("bihsop", "black")
@@ -413,7 +413,7 @@ class TestCheckCheck:
         assert len(result) == 2
 
     def test_white_pawn_checking_black_king_diagonal(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[5][3] = ("pawnw", "white")  # Peut capturer en diagonale
 
@@ -422,7 +422,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_white_pawn_not_checking_black_king_forward(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[5][4] = ("pawnw", "white")  # Ne peut pas capturer droit devant
 
@@ -430,7 +430,7 @@ class TestCheckCheck:
         assert result == []
 
     def test_black_pawn_checking_white_king_diagonal(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[3][3] = ("pawnb", "black")  # Peut capturer en diagonale
 
@@ -439,7 +439,7 @@ class TestCheckCheck:
         assert len(result) == 1
 
     def test_black_pawn_not_checking_white_king_forward(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[3][4] = ("pawnb", "black")  # Ne peut pas capturer droit devant
 
@@ -447,14 +447,14 @@ class TestCheckCheck:
         assert result == []
 
     def test_white_pawn_diagonal_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[5][3] = ("pawnw", "white")  # attaque diagonale
         result = engine.check_check(board, (4, 4))
         assert (5, 3) in result
 
     def test_black_pawn_diagonal_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[3][3] = ("pawnb", "black")  # attaque diagonale
         result = engine.check_check(board, (4, 4))
@@ -462,35 +462,35 @@ class TestCheckCheck:
 
     # ❌ Cas incorrects — pas de mise en échec
     def test_white_pawn_behind_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[3][4] = ("pawnw", "white")  # derrière le roi
         result = engine.check_check(board, (4, 4))
         assert result == []
 
     def test_black_pawn_behind_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[5][4] = ("pawnb", "black")  # derrière le roi
         result = engine.check_check(board, (4, 4))
         assert result == []
 
     def test_white_pawn_sideways_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[4][5] = ("pawnw", "white")  # à côté, mais pas en diagonale
         result = engine.check_check(board, (4, 4))
         assert result == []
 
     def test_black_pawn_sideways_king(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[4][3] = ("pawnb", "black")  # à côté, mais pas en diagonale
         result = engine.check_check(board, (4, 4))
         assert result == []
 
     def test_white_pawn_forward_but_blocked(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "black")
         board[5][4] = (
             "pawnw",
@@ -500,7 +500,7 @@ class TestCheckCheck:
         assert result == []
 
     def test_black_pawn_forward_but_blocked(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[4][4] = ("king", "white")
         board[3][4] = ("pawnb", "black")  # juste devant — ne capture pas droit
         result = engine.check_check(board, (4, 4))
@@ -508,22 +508,15 @@ class TestCheckCheck:
 
     # 🔁 Cas symétriques et bords de plateau
     def test_white_pawn_on_edge_can_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[0][0] = ("king", "black")
         board[1][1] = ("pawnw", "white")  # diagonale vers coin
         result = engine.check_check(board, (0, 0))
         assert (1, 1) in result
 
     def test_black_pawn_on_edge_can_check(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
+        board = [[("0", "0") for _ in range(8)] for _ in range(8)]
         board[7][7] = ("king", "white")
         board[6][6] = ("pawnb", "black")  # diagonale vers coin
         result = engine.check_check(board, (7, 7))
         assert (6, 6) in result
-
-
-class TestBasicFunc:
-    def test_get_piece(self):
-        board = [["00" for _ in range(8)] for _ in range(8)]
-        board[4][1] = ("queen", "w")
-        assert engine.get_piece(board, (4, 1)) == ("queen", "w")
