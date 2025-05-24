@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 PIECES = {
     "knight": {
         "moves": (
@@ -153,16 +154,15 @@ def list_valid_move_pawn(
     for i, move in enumerate(PIECES[piece_type]["moves"]):
         new_y, new_x = y + move[0], x + move[1]
         if 0 <= new_y <= 7 and 0 <= new_x <= 7:
-            if i == 0:
-                if board[new_y][new_x] == ("0", "0"):
-                    move_list.append((new_y, new_x))
-                    if (
-                        new_y < 7
-                        and board[y + (-2 * direction)][x] == ("0", "0")
-                        and bound == y
-                    ):
-                        move_list.append((y + (-2 * direction), x))
-            else:
+            if i == 0 and board[new_y][new_x] == ("0", "0"):
+                move_list.append((new_y, new_x))
+                if (
+                    new_y < 7
+                    and board[y + (-2 * direction)][x] == ("0", "0")
+                    and bound == y
+                ):
+                    move_list.append((y + (-2 * direction), x))
+            elif i != 0:
                 if board[new_y][new_x][1] != piece_color and board[new_y][new_x] != (
                     "0",
                     "0",
@@ -184,7 +184,7 @@ def promote_pawn(board: list[list[tuple[str, str]]], cell: tuple[int, int]) -> N
             board[y][x] = ("queen", board[y][x][1])
 
 
-def check_check(
+def check_check_gpt(
     board: list[list[tuple[str, str]]], cell: tuple[int, int]
 ) -> list[tuple[int, int]]:
     """give the cells where a piece is checking the cell
@@ -211,6 +211,36 @@ def check_check(
             if cell in possible_moves:
                 checking_cells.append((i, j))
     return checking_cells
+
+
+# demander quelle version faire un set supprimer les pièces à chaque fois ? ou parcourir tout le tableau pour voir les pièces dispo ?
+def check_check(
+    board: list[list[tuple[str, str]]], cell: tuple[int, int]
+) -> list[tuple[int, int]]:
+    """give the cells where a piece is checking the cell
+
+    Args:
+        board (list[list[tuple[str, str]]]): game board
+        cell (tuple[int,int]): cell (y,x) where check is needed
+
+    Returns:
+        list[tuple[int, int]]: list of positions (y,x) of pieces checking the given cell
+    """
+    y, x = cell
+    checking_cell = []
+    possible_moves = []
+    if board[y][x][1] not in {"white", "black"}:
+        return []
+    for piece in PIECES.keys():
+        possible_moves.extend(list_valid_move(board, (y, x), piece))
+        piece = "pawnw" if piece == "pawnb" else "pawnb" if piece == "pawnw" else piece
+        print(possible_moves, piece)
+        for coord in possible_moves:
+            new_y, new_x = coord
+            if piece == board[new_y][new_x][0] and coord not in checking_cell:
+                checking_cell.append(coord)
+        possible_moves = []
+    return checking_cell
 
 
 def find_king(board: list[list[tuple[str, str]]], color: str) -> tuple[int, int]:
@@ -262,4 +292,9 @@ def move_piece(
 
 
 if __name__ == "__main__":
-    pass
+    board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+    board[4][4] = ("king", "black")
+    board[5][3] = ("pawnw", "white")  # Peut capturer en diagonale
+
+    result = check_check(board, (4, 4))
+    print(result)
