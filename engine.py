@@ -58,7 +58,7 @@ PIECES = {
 }
 
 
-board = [
+board: Board = [
     [
         ("rook", "black"),
         ("knight", "black"),
@@ -88,11 +88,12 @@ board = [
 ]
 
 
-def print_board(board: list[list[tuple[str, str]]]):
-    """print the game board
+def print_board(board: Board) -> None:
+    """
+    Print the game board to the console.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
+        board (Board): The chess board to display.
     """
     for i, line in enumerate(board):
         print(i, end=" ")
@@ -105,17 +106,18 @@ def list_valid_move(
     board: Board,
     cell: Position,
     specific_piece: Optional[str] = None,
-) -> list[tuple[int, int]]:
-    """list all valid moves for the piece at the given cell on the board
+) -> list[Position]:
+    """
+    List all valid moves for the piece at a given cell on the board.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
-        cell (tuple[int, int]): coordinates of the piece (y,x)
-        specific_piece (Optional[str], optional): If provided, use this piece type instead of the actual one in the cell.
-         Defaults to None.
+        board (Board): The chess board.
+        cell (Position): Coordinates (row, column) of the piece.
+        specific_piece (Optional[str], optional): If provided, use this piece type
+            instead of the one actually in the cell.
 
     Returns:
-        list[tuple[int, int]]: a list with every cells (y,x) where the piece can move to
+        list[Position]: A list of cells (row, column) where the piece can move.
     """
     y, x = cell
     piece_type = specific_piece or board[y][x][0]
@@ -147,17 +149,18 @@ def list_valid_move_pawn(
     piece_type: str,
     piece_color: str,
 ) -> list[Position]:
-    """sub-fonction for list_valid_move
+    """
+    List all valid moves for a pawn at the given position.
 
     Args:
-        board (list[list[tuple[str, str]]]): _description_
-        y (int): y-coordinate
-        x (int): x-coordinate
-        piece_type (str):
-        piece_color (str): "white" | "black
+        board (Board): The chess board.
+        y (int): Row coordinate of the pawn.
+        x (int): Column coordinate of the pawn.
+        piece_type (str): Piece type (e.g., "pawnw" or "pawnb").
+        piece_color (str): Piece color ("white" or "black").
 
     Returns:
-        list[tuple[int, int]]: a list with every cell (y,x) where the pawn can go
+        list[Position]: A list of cells (row, column) where the pawn can move.
     """
     move_list = []
     bound = 6 if piece_color == "white" else 1
@@ -183,12 +186,13 @@ def list_valid_move_pawn(
     return move_list
 
 
-def promote_pawn(board: list[list[tuple[str, str]]], cell: tuple[int, int]) -> None:
-    """check if a pawn is promotabe then transform the cell in the board with queen
+def promote_pawn(board: Board, cell: Position) -> None:
+    """
+    Promote a pawn to a queen if it has reached the promotion rank.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
-        cell (tuple[int, int]): coordinates of the piece (y,x)
+        board (Board): The chess board.
+        cell (Position): Coordinates (row, column) of the pawn.
     """
     y, x = cell
     if board[y][x][0][0:4] == "pawn":
@@ -196,18 +200,16 @@ def promote_pawn(board: list[list[tuple[str, str]]], cell: tuple[int, int]) -> N
             board[y][x] = ("queen", board[y][x][1])
 
 
-# demander quelle version faire un set supprimer les pièces à chaque fois ? ou parcourir tout le tableau pour voir les pièces dispo ?
-def check_check(
-    board: list[list[tuple[str, str]]], cell: tuple[int, int]
-) -> list[tuple[int, int]]:
-    """give the cells where a piece is checking the cell
+def check_check(board: Board, cell: Position) -> list[Position]:
+    """
+    Return the positions of pieces that are checking the given cell.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
-        cell (tuple[int,int]): cell (y,x) where check is needed
+        board (Board): The chess board.
+        cell (Position): The cell (row, column) to check.
 
     Returns:
-        list[tuple[int, int]]: list of positions (y,x) of pieces checking the given cell
+        list[Position]: Positions of pieces checking the given cell.
     """
     y, x = cell
     checking_cell = []
@@ -224,47 +226,50 @@ def check_check(
     return checking_cell
 
 
-def find_king(board: list[list[tuple[str, str]]], color: str) -> tuple[int, int]:
-    """find where the king is
+def find_king(board: Board, color: str) -> Optional[Position]:
+    """
+    Find the position of the king of the specified color.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
-        color (str): the color of the king we want to find
+        board (Board): The chess board.
+        color (str): The color of the king to find ("white" or "black").
 
     Returns:
-        tuple[int, int]: tuple  of position (y,x)
+        Optional[Position]: Position (row, column) of the king, or None if not found.
     """
     for i, line in enumerate(board):
         for j, cell in enumerate(line):
             if cell[0] == "king" and cell[1] == color:
                 return (i, j)
+    return None
 
 
 def move_piece(
-    board: list[list[tuple[str, str]]],
+    board: Board,
     y: int,
     x: int,
     new_y: int,
     new_x: int,
     color: str,
-) -> list[list[tuple[str, str]]]:
-    """move a piece a return the board with the piece mooved
+) -> Board:
+    """
+    Move a piece from (y, x) to (new_y, new_x) if the move is valid.
 
     Args:
-        board (list[list[tuple[str, str]]]): game board
-        y (int): y value for the initial cell
-        x (int): x vlaue for the initial cell
-        new_y (int): y value for the wanted cell
-        new_x (int): x value for the wanted cell
-        color (str): the color of the piece we want to move (to avoid moving an opponent piece)
+        board (Board): The chess board.
+        y (int): Row of the piece to move.
+        x (int): Column of the piece to move.
+        new_y (int): Destination row.
+        new_x (int): Destination column.
+        color (str): The color of the piece to move.
 
     Returns:
-        list[list[tuple[str, str]]]: gmae board
+        Board: The updated chess board if the move is valid, otherwise -1.
     """
     if board[y][x][1] != color:
         return -1
-    possible_mooves = list_valid_move(board, (y, x))
-    if (new_y, new_x) in possible_mooves:
+    possible_moves = list_valid_move(board, (y, x))
+    if (new_y, new_x) in possible_moves:
         board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
     else:
@@ -275,7 +280,7 @@ def move_piece(
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
     board[4][4] = ("king", "black")
-    board[5][3] = ("pawnw", "white")  # Peut capturer en diagonale
+    board[5][3] = ("pawnw", "white")  # Can capture diagonally
 
     result = check_check(board, (4, 4))
     print(result)
