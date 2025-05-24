@@ -1,6 +1,15 @@
-from typing import Optional
+"""
+Type aliases:
+    Position: tuple[int, int] -- (row, column) on the board
+    Board: list[list[tuple[str, str]]] -- 8x8 chess board, each cell is (piece, color)
+"""
 
+from typing import Optional, Tuple
 
+Board = list[list[Tuple[str, str]]]
+Position = Tuple[int, int]
+
+VOID_CELL = ("0", "0")
 PIECES = {
     "knight": {
         "moves": (
@@ -31,7 +40,7 @@ PIECES = {
     },
     "pawnw": {"moves": ((-1, 0), (-1, -1), (-1, 1)), "repeat": False, "promote": 0},
     "pawnb": {"moves": ((1, 0), (1, 1), (1, -1)), "repeat": False, "promote": 7},
-    "bihsop": {"moves": ((1, 1), (-1, -1), (1, -1), (-1, 1)), "repeat": True},
+    "bishop": {"moves": ((1, 1), (-1, -1), (1, -1), (-1, 1)), "repeat": True},
     "queen": {
         "moves": (
             (1, 0),
@@ -53,26 +62,26 @@ board = [
     [
         ("rook", "black"),
         ("knight", "black"),
-        ("bihsop", "black"),
+        ("bishop", "black"),
         ("queen", "black"),
         ("king", "black"),
-        ("bihsop", "black"),
+        ("bishop", "black"),
         ("knight", "black"),
         ("rook", "black"),
     ],
     [("pawnb", "black") for _ in range(8)],
-    [("0", "0") for _ in range(8)],
-    [("0", "0") for _ in range(8)],
-    [("0", "0") for _ in range(8)],
-    [("0", "0") for _ in range(8)],
+    [VOID_CELL for _ in range(8)],
+    [VOID_CELL for _ in range(8)],
+    [VOID_CELL for _ in range(8)],
+    [VOID_CELL for _ in range(8)],
     [("pawnw", "white") for _ in range(8)],
     [
         ("rook", "white"),
         ("knight", "white"),
-        ("bihsop", "white"),
+        ("bishop", "white"),
         ("king", "white"),
         ("queen", "white"),
-        ("bihsop", "white"),
+        ("bishop", "white"),
         ("knight", "white"),
         ("rook", "white"),
     ],
@@ -93,8 +102,8 @@ def print_board(board: list[list[tuple[str, str]]]):
 
 
 def list_valid_move(
-    board: list[list[tuple[str, str]]],
-    cell: tuple[int, int],
+    board: Board,
+    cell: Position,
     specific_piece: Optional[str] = None,
 ) -> list[tuple[int, int]]:
     """list all valid moves for the piece at the given cell on the board
@@ -112,8 +121,10 @@ def list_valid_move(
     piece_type = specific_piece or board[y][x][0]
     piece_color = board[y][x][1]
     valid_moves = []
+
     if piece_type in ("pawnb", "pawnw"):
         return list_valid_move_pawn(board, y, x, piece_type, piece_color)
+
     repeat = PIECES[piece_type]["repeat"]
     for dy, dx in PIECES[piece_type]["moves"]:
         new_y, new_x = y + dy, x + dx
@@ -122,7 +133,7 @@ def list_valid_move(
             if target_color == piece_color:
                 break
             valid_moves.append((new_y, new_x))
-            if target_piece != "0" or not repeat:
+            if target_piece != VOID_CELL[0] or not repeat:
                 break
             new_y += dy
             new_x += dx
@@ -130,12 +141,12 @@ def list_valid_move(
 
 
 def list_valid_move_pawn(
-    board: list[list[tuple[str, str]]],
+    board: Board,
     y: int,
     x: int,
     piece_type: str,
     piece_color: str,
-) -> list[tuple[int, int]]:
+) -> list[Position]:
     """sub-fonction for list_valid_move
 
     Args:
@@ -150,22 +161,23 @@ def list_valid_move_pawn(
     """
     move_list = []
     bound = 6 if piece_color == "white" else 1
-    direction = 1 if piece_color == "white" else -1
+    direction = -1 if piece_color == "white" else 1
+
     for i, move in enumerate(PIECES[piece_type]["moves"]):
         new_y, new_x = y + move[0], x + move[1]
         if 0 <= new_y <= 7 and 0 <= new_x <= 7:
-            if i == 0 and board[new_y][new_x] == ("0", "0"):
+            if i == 0 and board[new_y][new_x] == VOID_CELL:
                 move_list.append((new_y, new_x))
                 if (
                     new_y < 7
-                    and board[y + (-2 * direction)][x] == ("0", "0")
+                    and board[y + (2 * direction)][x] == VOID_CELL
                     and bound == y
                 ):
-                    move_list.append((y + (-2 * direction), x))
+                    move_list.append((y + (2 * direction), x))
             elif i != 0:
-                if board[new_y][new_x][1] != piece_color and board[new_y][new_x] != (
-                    "0",
-                    "0",
+                if (
+                    board[new_y][new_x][1] != piece_color
+                    and board[new_y][new_x] != VOID_CELL
                 ):
                     move_list.append((new_y, new_x))
     return move_list
@@ -184,35 +196,6 @@ def promote_pawn(board: list[list[tuple[str, str]]], cell: tuple[int, int]) -> N
             board[y][x] = ("queen", board[y][x][1])
 
 
-def check_check_gpt(
-    board: list[list[tuple[str, str]]], cell: tuple[int, int]
-) -> list[tuple[int, int]]:
-    """give the cells where a piece is checking the cell
-
-    Args:
-        board (list[list[tuple[str, str]]]): game board
-        cell (tuple[int,int]): cell (y,x) where check is needed
-
-    Returns:
-        list[tuple[int, int]]: list of positions (y,x) of pieces checking the given cell
-    """
-    y, x = cell
-    checking_cells = []
-    target_color = board[y][x][1]
-    if target_color not in {"white", "black"}:
-        return []
-    opponent_color = "black" if target_color == "white" else "white"
-    for i in range(8):
-        for j in range(8):
-            piece, color = board[i][j]
-            if color != opponent_color or piece == "0":
-                continue
-            possible_moves = list_valid_move(board, (i, j))
-            if cell in possible_moves:
-                checking_cells.append((i, j))
-    return checking_cells
-
-
 # demander quelle version faire un set supprimer les pièces à chaque fois ? ou parcourir tout le tableau pour voir les pièces dispo ?
 def check_check(
     board: list[list[tuple[str, str]]], cell: tuple[int, int]
@@ -228,18 +211,16 @@ def check_check(
     """
     y, x = cell
     checking_cell = []
-    possible_moves = []
     if board[y][x][1] not in {"white", "black"}:
         return []
     for piece in PIECES.keys():
+        possible_moves = []
         possible_moves.extend(list_valid_move(board, (y, x), piece))
         piece = "pawnw" if piece == "pawnb" else "pawnb" if piece == "pawnw" else piece
-        print(possible_moves, piece)
         for coord in possible_moves:
             new_y, new_x = coord
             if piece == board[new_y][new_x][0] and coord not in checking_cell:
                 checking_cell.append(coord)
-        possible_moves = []
     return checking_cell
 
 
@@ -284,7 +265,7 @@ def move_piece(
         return -1
     possible_mooves = list_valid_move(board, (y, x))
     if (new_y, new_x) in possible_mooves:
-        board[new_y][new_x], board[y][x] = board[y][x], ("0", "0")
+        board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
     else:
         return -1
@@ -292,7 +273,7 @@ def move_piece(
 
 
 if __name__ == "__main__":
-    board = [[("0", "0") for _ in range(8)] for _ in range(8)]
+    board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
     board[4][4] = ("king", "black")
     board[5][3] = ("pawnw", "white")  # Peut capturer en diagonale
 
