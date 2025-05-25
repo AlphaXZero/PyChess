@@ -285,10 +285,22 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     return True
 
 
-# def is_stalemate(board: Board, cell: Position, color):
-#     king_cell = find_king(board, color)
-#     sim_board = deepcopy(board)
-#     for move in
+def is_stalemate(board: Board, cell: Position) -> bool:
+    if is_check(board, cell):
+        return False
+
+    for move in list_valid_move(board, cell, ignore_king_safety=True):
+        sim_board = deepcopy(board)
+        sim_board = move_piece(
+            sim_board, cell[0], cell[1], move[0], move[1], board[cell[0]][cell[1]][1]
+        )
+        if not is_check(board, (move[0], move[1])):
+            return False
+    return True
+
+
+def is_rock(board: Board, cell: Position) -> bool:
+    pass
 
 
 def find_king(board: Board, color: str) -> Optional[Position]:
@@ -408,4 +420,4 @@ if __name__ == "__main__":
     board[5][6] = ("queen", "white")
     board[5][5] = ("king", "white")
     print_board(board)
-    print("ici", is_check(board, (7, 7)))
+    print("ici", is_stalemate(board, (7, 7)))

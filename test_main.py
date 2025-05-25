@@ -317,7 +317,7 @@ class TestIsCheckMat:
         board[5][6] = ("queen", "white")
         board[5][5] = ("king", "white")
         # Le roi noir ne peut pas bouger mais il n'est pas en échec
-        assert not engine.is_check_mat(board, (7, 7))
+        assert engine.is_stalemate(board, (7, 7))
 
     def test_not_checkmate_alone(self, empty_board):
         board = empty_board
