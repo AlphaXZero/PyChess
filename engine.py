@@ -323,9 +323,6 @@ def move_piece(
     possible_moves = list_valid_move(board, (y, x))
     if (new_y, new_x) in possible_moves:
         update_history(HISTORY, board, (y, x), (new_y, new_x))
-        print(HISTORY)
-        if len(HISTORY) >= 2:
-            print(HISTORY[-1]["piece_symbol"][0], "-->", HISTORY[-2]["new_cell"][1])
         if (
             len(HISTORY) >= 2
             and HISTORY[-1]["piece_symbol"][0] == "p"
@@ -394,10 +391,7 @@ if __name__ == "__main__":
     # print(is_check_mat(board, (7, 7)))
 
     print("--------------------")
-    board[1][5] = ("pawnb", "black")
-    print(list_valid_move(board, (1, 5)))
-    move_piece(board, 1, 5, 3, 5, "black")
-    board[3][4] = ("pawnw", "white")
+    board[1][0] = ("pawnw", "white")
+    move_piece(board, 1, 0, 0, 0, "white")
     print_board(board)
-    result = move_piece(board, 3, 4, 2, 5, "white")
-    print_board(result)
+    print(board[0][0])

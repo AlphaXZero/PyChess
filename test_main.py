@@ -170,8 +170,9 @@ class TestPawnMoves:
 
     def test_en_passant_capture_by_white(self, empty_board):
         board = empty_board
+        board[1][5] = ("pawnb", "black")
+        engine.move_piece(board, 1, 5, 3, 5, "black")
         board[3][4] = ("pawnw", "white")
-        board[3][5] = ("pawnb", "black")
         result = engine.move_piece(board, 3, 4, 2, 5, "white")
         assert result[2][5] == ("pawnw", "white")
         assert result[3][5] == VOID_CELL
