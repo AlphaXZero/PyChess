@@ -109,7 +109,7 @@ def get_clicked_cell1(event):
             color[GAME_TURN % 2],
         )
         current_moove = []
-    check_white = engine.check_check(
+    check_white = engine.is_check(
         current_board, engine.find_king(current_board, "white")
     )
     print(check_white)
@@ -117,7 +117,7 @@ def get_clicked_cell1(event):
     for i in check_white:
         draw_warn_circles(i)
 
-    check_black = engine.check_check(
+    check_black = engine.is_check(
         current_board, engine.find_king(current_board, "black")
     )
     print(check_black)
@@ -222,7 +222,7 @@ def draw_pawn(x, y, color):
     canvas.create_oval(x + 20, y + 5, x + 30, y + 15, outline=color, fill=color)
 
 
-def draw_bihsop(x, y, color):
+def draw_bishop(x, y, color):
     global canvas
     x, y = x * 50, y * 50
     # base
@@ -281,8 +281,8 @@ def draw_board():
 
 
 def draw_piece(piece, x, y):
-    if piece[0] == "bihsop":
-        draw_bihsop(x, y, COLOR_THEME[piece[1]])
+    if piece[0] == "bishop":
+        draw_bishop(x, y, COLOR_THEME[piece[1]])
     if piece[0] == "rook":
         draw_rook(x, y, COLOR_THEME[piece[1]])
     if piece[0] == "pawnb":
@@ -299,7 +299,7 @@ def draw_piece(piece, x, y):
 
 def show_move(y, x, newy, newx, col):
     global GAME_TURN
-    if engine.move_piece(current_board, y, x, newy, newx, col) != -1:
+    if engine.move_piece(current_board, y, x, newy, newx, col) is not None:
         engine.move_piece(current_board, y, x, newy, newx, col)
         GAME_TURN += 1
         update_turn_lab()

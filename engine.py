@@ -1,10 +1,15 @@
 """
+Chess board game engine
 Type aliases:
     Position: tuple[int, int] -- (row, column) on the board
     Board: list[list[tuple[str, str]]] -- 8x8 chess board, each cell is (piece, color)
 """
 
+__author__ = "georgevdv"
+__version__ = "0.8.0"
 from typing import Optional, Tuple
+from copy import deepcopy
+import colorama as c
 
 Board = list[list[Tuple[str, str]]]
 Position = Tuple[int, int]
@@ -95,10 +100,16 @@ def print_board(board: Board) -> None:
     Args:
         board (Board): The chess board to display.
     """
+    c.init()
     for i, line in enumerate(board):
         print(i, end=" ")
         for cell in line:
-            print(cell[0][0], end=" ")
+            if cell[1] == "white":
+                print(c.Back.WHITE + cell[0][0] + c.Style.RESET_ALL, end=" ")
+            elif cell[1] == "black":
+                print(c.Back.BLUE + cell[0][0] + c.Style.RESET_ALL, end=" ")
+            else:
+                print(cell[0][0], end=" ")
         print()
 
 
@@ -142,6 +153,7 @@ def list_valid_move(
     return valid_moves
 
 
+# TODO : en passant regarde ligne
 def list_valid_move_pawn(
     board: Board,
     y: int,
@@ -164,7 +176,7 @@ def list_valid_move_pawn(
     """
     move_list = []
     bound = 6 if piece_color == "white" else 1
-    direction = -1 if piece_color == "white" else 1
+    direction = (-1) if piece_color == "white" else 1
 
     for i, move in enumerate(PIECES[piece_type]["moves"]):
         new_y, new_x = y + move[0], x + move[1]
@@ -173,8 +185,8 @@ def list_valid_move_pawn(
                 move_list.append((new_y, new_x))
                 if (
                     new_y < 7
-                    and board[y + (2 * direction)][x] == VOID_CELL
                     and bound == y
+                    and board[y + (2 * direction)][x] == VOID_CELL
                 ):
                     move_list.append((y + (2 * direction), x))
             elif i != 0:
@@ -200,7 +212,7 @@ def promote_pawn(board: Board, cell: Position) -> None:
             board[y][x] = ("queen", board[y][x][1])
 
 
-def check_check(board: Board, cell: Position) -> list[Position]:
+def is_check(board: Board, cell: Position) -> list[Position]:
     """
     Return the positions of pieces that are checking the given cell.
 
@@ -216,14 +228,43 @@ def check_check(board: Board, cell: Position) -> list[Position]:
     if board[y][x][1] not in {"white", "black"}:
         return []
     for piece in PIECES.keys():
-        possible_moves = []
-        possible_moves.extend(list_valid_move(board, (y, x), piece))
-        piece = "pawnw" if piece == "pawnb" else "pawnb" if piece == "pawnw" else piece
+        sim_piece = (
+            "pawnw" if piece == "pawnb" else "pawnb" if piece == "pawnw" else piece
+        )
+        possible_moves = list_valid_move(board, (y, x), sim_piece)
         for coord in possible_moves:
             new_y, new_x = coord
-            if piece == board[new_y][new_x][0] and coord not in checking_cell:
+            if (
+                piece == board[new_y][new_x][0]
+                and coord not in checking_cell
+                and board[y][x][1] != board[new_y][new_x][1]
+            ):
                 checking_cell.append(coord)
     return checking_cell
+
+
+def is_check_mat(board: Board, cell: Position) -> bool:
+    """
+    Determines whether the king is in checkmate from a given position on the board.
+
+    Args:
+        board (Board): The current state of the chessboard, including all pieces and their positions.
+        cell (Position): The position of the king to check for checkmate.
+
+    Returns:
+        bool: True if checkmate else False
+    """
+    y, x = cell
+    piece_color = board[y][x][1]
+    for move in PIECES[board[y][x][0]]["moves"]:
+        new_y, new_x = y + move[0], x + move[1]
+        board_test = deepcopy(board)
+        board_test = move_piece(board_test, y, x, new_y, new_x, piece_color)
+        if board_test is None:
+            continue
+        if is_check(board_test, (new_y, new_x)) == []:
+            return False
+    return True
 
 
 def find_king(board: Board, color: str) -> Optional[Position]:
@@ -251,7 +292,7 @@ def move_piece(
     new_y: int,
     new_x: int,
     color: str,
-) -> Board:
+) -> Board | None:
     """
     Move a piece from (y, x) to (new_y, new_x) if the move is valid.
 
@@ -264,23 +305,34 @@ def move_piece(
         color (str): The color of the piece to move.
 
     Returns:
-        Board: The updated chess board if the move is valid, otherwise -1.
+        Board | None: The updated chess board if the move is valid, otherwise None.
     """
     if board[y][x][1] != color:
-        return -1
+        return None
     possible_moves = list_valid_move(board, (y, x))
     if (new_y, new_x) in possible_moves:
         board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
     else:
-        return -1
+        return None
     return board
 
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[4][4] = ("king", "black")
-    board[5][3] = ("pawnw", "white")  # Can capture diagonally
+    # Pat : roi noir en h8, roi blanc en f7, dame blanche en g6
 
-    result = check_check(board, (4, 4))
-    print(result)
+    # board[7][7] = ("king", "white")
+    # board[6][6] = ("pawnw", "black")
+    # board[5][5] = ("king", "black")
+    # print(is_check(board, (7, 7)))
+    # print_board(board)
+    # print(is_check_mat(board, (7, 7)))
+
+    print("--------------------")
+    board[7][7] = ("king", "black")
+    board[6][6] = ("pawnw", "white")
+    board[5][5] = ("king", "white")
+    print_board(board)
+    print(is_check(board, (7, 7)))
+    print(is_check_mat(board, (7, 7)))
