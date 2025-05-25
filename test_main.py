@@ -172,7 +172,7 @@ class TestPawnMoves:
         board = empty_board
         board[3][4] = ("pawnw", "white")
         board[3][5] = ("pawnb", "black")
-        result = engine.move_piece(board, 3, 4, 2, 5, "white", en_passant_target=(3, 5))
+        result = engine.move_piece(board, 3, 4, 2, 5, "white")
         assert result[2][5] == ("pawnw", "white")
         assert result[3][5] == VOID_CELL
 
@@ -180,10 +180,7 @@ class TestPawnMoves:
         board = empty_board
         board[3][4] = ("pawnw", "white")
         board[3][5] = ("pawnb", "black")
-        assert (
-            engine.move_piece(board, 3, 4, 2, 5, "white", en_passant_target=None)
-            is None
-        )
+        assert engine.move_piece(board, 3, 4, 2, 5, "white") is None
 
 
 class TestMovePieceGeneral:
