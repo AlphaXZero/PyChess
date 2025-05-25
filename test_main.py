@@ -9,6 +9,11 @@ def empty_board():
     return [[VOID_CELL for _ in range(8)] for _ in range(8)]
 
 
+@pytest.fixture(autouse=True)
+def reset_history():
+    engine.HISTORY.clear()
+
+
 class TestKnightMoves:
     def test_knight_moves_center(self, empty_board):
         board = empty_board
@@ -152,6 +157,7 @@ class TestPawnMoves:
         board = empty_board
         board[1][0] = ("pawnw", "white")
         engine.move_piece(board, 1, 0, 0, 0, "white")
+        print("DEBUG:", board[0][0])
         assert board[0][0] == ("queen", "white")
 
     def test_pawn_blocked_forward(self, empty_board):

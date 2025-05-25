@@ -153,10 +153,11 @@ def list_valid_move(
                 break
             new_y += dy
             new_x += dx
+
     return valid_moves
 
 
-# TODO : en passant regarde ligne
+# TODO : en passant bug 2 pions déplacé de 2
 def list_valid_move_pawn(
     board: Board,
     y: int,
@@ -223,6 +224,7 @@ def promote_pawn(board: Board, cell: Position) -> None:
             board[y][x] = ("queen", board[y][x][1])
 
 
+# TODO changer pour autre bersion je pense
 def is_check(board: Board, cell: Position) -> list[Position]:
     """
     Return the positions of pieces that are checking the given cell.
@@ -235,23 +237,14 @@ def is_check(board: Board, cell: Position) -> list[Position]:
         list[Position]: Positions of pieces checking the given cell.
     """
     y, x = cell
-    checking_cell = []
-    if board[y][x][1] not in {"white", "black"}:
-        return []
-    for piece in PIECES.keys():
-        sim_piece = (
-            "pawnw" if piece == "pawnb" else "pawnb" if piece == "pawnw" else piece
-        )
-        possible_moves = list_valid_move(board, (y, x), sim_piece)
-        for coord in possible_moves:
-            new_y, new_x = coord
-            if (
-                piece == board[new_y][new_x][0]
-                and coord not in checking_cell
-                and board[y][x][1] != board[new_y][new_x][1]
-            ):
-                checking_cell.append(coord)
-    return checking_cell
+    checking_cells = []
+    piece_color = board[y][x][1]
+    for n_y in range(8):
+        for n_x in range(8):
+            if board[n_y][n_x][1] != piece_color:
+                if (y, x) in list_valid_move(board, (n_y, n_x)):
+                    checking_cells.append((n_y, n_x))
+    return checking_cells
 
 
 def is_check_mat(board: Board, cell: Position) -> bool:
@@ -391,7 +384,10 @@ if __name__ == "__main__":
     # print(is_check_mat(board, (7, 7)))
 
     print("--------------------")
-    board[1][0] = ("pawnw", "white")
-    move_piece(board, 1, 0, 0, 0, "white")
+    board[4][4] = ("king", "white")
+    board[3][5] = ("rook", "black")
+    # La case (4,5) est attaquée par la tour noire
+    move_piece(board, 4, 4, 4, 5, "white")
+
     print_board(board)
-    print(board[0][0])
+    print("ici", is_check(board, (4, 5)))
