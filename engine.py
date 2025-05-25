@@ -15,6 +15,8 @@ Board = list[list[Tuple[str, str]]]
 Position = Tuple[int, int]
 
 VOID_CELL = ("0", "0")
+HISTORY = []
+X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
 PIECES = {
     "knight": {
         "moves": (
@@ -190,9 +192,18 @@ def list_valid_move_pawn(
                 ):
                     move_list.append((y + (2 * direction), x))
             elif i != 0:
+                en_passant_bound = 3 if "white" == piece_color else 4
+                start_cell = 7 if "black" == piece_color else 2
+                end_cell = 5 if "black" == piece_color else 4
                 if (
                     board[new_y][new_x][1] != piece_color
                     and board[new_y][new_x] != VOID_CELL
+                ) or (
+                    y == en_passant_bound
+                    and board[new_y - direction][new_x][0][:-1] == "pawn"
+                    and board[new_y - direction][new_x][1] != piece_color
+                    and len(HISTORY) != 0
+                    and abs(HISTORY[-1]["cell"][0] - HISTORY[-1]["new_cell"][0]) == 2
                 ):
                     move_list.append((new_y, new_x))
     return move_list
@@ -311,11 +322,47 @@ def move_piece(
         return None
     possible_moves = list_valid_move(board, (y, x))
     if (new_y, new_x) in possible_moves:
+        update_history(HISTORY, board, (y, x), (new_y, new_x))
+        print(HISTORY)
         board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
+
     else:
         return None
     return board
+
+
+# TODO regarder si autre piece peut aller là-bas pour enlever le y,x
+def update_history(
+    history: list[str], board: Board, cell: Position, new_cell: Position
+) -> list[str]:
+    """
+    update an list history with a move
+
+    Args:
+        history (list[str]): base history
+        board (Board): game board
+        cell (Position): the initial cell
+        new_cell (Position): the cell afetr move
+
+    Returns:
+        list[str]: updated history with the move added
+    """
+    y, x = 8 - cell[0], X_NAME[cell[1]]
+    n_y, n_x = 8 - new_cell[0], X_NAME[new_cell[1]]
+    piece = board[cell[0]][cell[1]][0]
+    piece_symbol = piece[0] if piece[0] != "p" else piece[0] + piece[-1]
+    history.append(
+        {"piece_symbol": piece_symbol, "cell": (y, x), "new_cell": (n_y, n_x)}
+    )
+    return history
+
+
+def print_history(history: list[dict[str]]) -> None:
+    for item in history:
+        print(
+            f"{item['piece_symbol']}{item['cell'][0]}{item['cell'][1]}->{item['new_cell'][0]}{item['new_cell'][1]}"
+        )
 
 
 if __name__ == "__main__":
@@ -330,9 +377,8 @@ if __name__ == "__main__":
     # print(is_check_mat(board, (7, 7)))
 
     print("--------------------")
-    board[7][7] = ("king", "black")
-    board[6][6] = ("pawnw", "white")
-    board[5][5] = ("king", "white")
+    board[3][4] = ("pawnw", "white")
+    board[3][3] = ("pawnb", "black")
+    # board[2][5] = ("pawnb", "black")
     print_board(board)
-    print(is_check(board, (7, 7)))
-    print(is_check_mat(board, (7, 7)))
+    print(list_valid_move(board, (3, 4)))
