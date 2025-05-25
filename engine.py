@@ -120,6 +120,7 @@ def list_valid_move(
     board: Board,
     cell: Position,
     specific_piece: Optional[str] = None,
+    ignore_king_safety: bool = False,
 ) -> list[Position]:
     """
     List all valid moves for the piece at a given cell on the board.
@@ -153,6 +154,17 @@ def list_valid_move(
                 break
             new_y += dy
             new_x += dx
+    if piece_type == "king" and not ignore_king_safety:
+        safe_moves = []
+        for new_y, new_x in valid_moves:
+            sim_board = deepcopy(board)
+            sim_board[new_y][new_x], sim_board[y][x] = (
+                sim_board[y][x],
+                sim_board[new_y][new_x],
+            )
+            if not is_check(sim_board, (new_y, new_x)):
+                safe_moves.append((new_y, new_x))
+        return safe_moves
 
     return valid_moves
 
@@ -242,7 +254,9 @@ def is_check(board: Board, cell: Position) -> list[Position]:
     for n_y in range(8):
         for n_x in range(8):
             if board[n_y][n_x][1] != piece_color:
-                if (y, x) in list_valid_move(board, (n_y, n_x)):
+                if (y, x) in list_valid_move(
+                    board, (n_y, n_x), ignore_king_safety=True
+                ):
                     checking_cells.append((n_y, n_x))
     return checking_cells
 
@@ -269,6 +283,12 @@ def is_check_mat(board: Board, cell: Position) -> bool:
         if is_check(board_test, (new_y, new_x)) == []:
             return False
     return True
+
+
+# def is_stalemate(board: Board, cell: Position, color):
+#     king_cell = find_king(board, color)
+#     sim_board = deepcopy(board)
+#     for move in
 
 
 def find_king(board: Board, color: str) -> Optional[Position]:
@@ -384,10 +404,8 @@ if __name__ == "__main__":
     # print(is_check_mat(board, (7, 7)))
 
     print("--------------------")
-    board[4][4] = ("king", "white")
-    board[3][5] = ("rook", "black")
-    # La case (4,5) est attaquée par la tour noire
-    move_piece(board, 4, 4, 4, 5, "white")
-
+    board[7][7] = ("king", "black")
+    board[5][6] = ("queen", "white")
+    board[5][5] = ("king", "white")
     print_board(board)
-    print("ici", is_check(board, (4, 5)))
+    print("ici", is_check(board, (7, 7)))
