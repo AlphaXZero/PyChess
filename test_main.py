@@ -12,36 +12,36 @@ def empty_board():
 class TestKnightMoves:
     def test_knight_moves_center(self, empty_board):
         board = empty_board
-        board[3][3] = ("knight", "w")
+        board[3][3] = ("knight", "white")
         expected = [(5, 4), (5, 2), (1, 4), (1, 2), (4, 5), (4, 1), (2, 5), (2, 1)]
         moves = engine.list_valid_move(board, (3, 3))
         assert sorted(moves) == sorted(expected)
 
     def test_knight_moves_corner(self, empty_board):
         board = empty_board
-        board[0][0] = ("knight", "w")
+        board[0][0] = ("knight", "white")
         expected = [(2, 1), (1, 2)]
         moves = engine.list_valid_move(board, (0, 0))
         assert sorted(moves) == sorted(expected)
 
     def test_knight_moves_edge(self, empty_board):
         board = empty_board
-        board[6][7] = ("knight", "w")
+        board[6][7] = ("knight", "white")
         expected = [(4, 6), (7, 5), (5, 5)]
         moves = engine.list_valid_move(board, (6, 7))
         assert sorted(moves) == sorted(expected)
 
     def test_knight_blocked_by_ally(self, empty_board):
         board = empty_board
-        board[3][3] = ("knight", "w")
-        board[5][4] = ("pawnw", "w")
+        board[3][3] = ("knight", "white")
+        board[5][4] = ("pawnw", "white")
         moves = engine.list_valid_move(board, (3, 3))
         assert (5, 4) not in moves
 
     def test_knight_can_capture_enemy(self, empty_board):
         board = empty_board
-        board[3][3] = ("knight", "w")
-        board[5][4] = ("pawnb", "b")
+        board[3][3] = ("knight", "white")
+        board[5][4] = ("pawnb", "black")
         moves = engine.list_valid_move(board, (3, 3))
         assert (5, 4) in moves
 
@@ -49,7 +49,7 @@ class TestKnightMoves:
 class TestRookMoves:
     def test_rook_center(self, empty_board):
         board = empty_board
-        board[4][4] = ("rook", "w")
+        board[4][4] = ("rook", "white")
         expected = [(i, 4) for i in range(8) if i != 4] + [
             (4, i) for i in range(8) if i != 4
         ]
@@ -58,8 +58,8 @@ class TestRookMoves:
 
     def test_rook_blocked_by_ally(self, empty_board):
         board = empty_board
-        board[4][4] = ("rook", "w")
-        board[4][6] = ("pawnw", "w")
+        board[4][4] = ("rook", "white")
+        board[4][6] = ("pawnw", "white")
         expected = [
             (0, 4),
             (1, 4),
@@ -79,8 +79,8 @@ class TestRookMoves:
 
     def test_rook_can_capture_enemy(self, empty_board):
         board = empty_board
-        board[4][4] = ("rook", "w")
-        board[4][6] = ("pawnb", "b")
+        board[4][4] = ("rook", "white")
+        board[4][6] = ("pawnb", "black")
         moves = engine.list_valid_move(board, (4, 4))
         assert (4, 6) in moves
 
@@ -93,13 +93,33 @@ class TestRookMoves:
 class TestQueenMoves:
     def test_queen_can_capture(self, empty_board):
         board = empty_board
-        board[4][4] = ("queen", "w")
-        board[1][1] = ("queen", "b")
+        board[4][4] = ("queen", "white")
+        board[1][1] = ("queen", "black")
         moves = engine.list_valid_move(board, (4, 4))
         assert (1, 1) in moves
 
 
 class TestPawnMoves:
+    def test_black_pawn_promotion(self, empty_board):
+        board = empty_board
+        board[6][0] = ("pawnb", "black")
+        engine.move_piece(board, 6, 0, 7, 0, "black")
+        assert board[7][0] == ("queen", "black")
+
+    def test_pawn_double_advance_blocked(self, empty_board):
+        board = empty_board
+        board[1][3] = ("pawnb", "black")
+        board[2][3] = ("pawnw", "white")  # Bloque juste devant
+        moves = engine.list_valid_move(board, (1, 3))
+        assert (3, 3) not in moves and (2, 3) not in moves
+
+    def test_pawn_blocked_cannot_advance(self, empty_board):
+        board = empty_board
+        board[6][4] = ("pawnw", "white")
+        board[5][4] = ("knight", "black")
+        moves = engine.list_valid_move(board, (6, 4))
+        assert (5, 4) not in moves
+
     def test_pawnb_single_advance(self, empty_board):
         board = empty_board
         board[2][3] = ("pawnb", "black")
@@ -171,7 +191,7 @@ class TestMovePieceGeneral:
         board = empty_board
         board[4][4] = ("rook", "white")
         board[4][6] = ("knight", "white")
-        assert engine.move_piece(board, 4, 4, 4, 6, "white") == None
+        assert engine.move_piece(board, 4, 4, 4, 6, "white") is None
 
     def test_capture_opponent(self, empty_board):
         board = empty_board
@@ -183,6 +203,22 @@ class TestMovePieceGeneral:
 
 
 class TestKingAndCheck:
+    def test_king_cannot_move_into_check(self, empty_board):
+        board = empty_board
+        board[4][4] = ("king", "white")
+        board[3][5] = ("rook", "black")
+        # La case (4,5) est attaquée par la tour noire
+        result = engine.move_piece(board, 4, 4, 4, 5, "white")
+        assert result is None
+
+    def test_king_cannot_capture_protected_piece(self, empty_board):
+        board = empty_board
+        board[4][4] = ("king", "white")
+        board[3][5] = ("rook", "black")
+        board[2][5] = ("rook", "black")  # Protège la tour noire
+        result = engine.move_piece(board, 4, 4, 3, 5, "white")
+        assert result is None
+
     def test_find_king_white(self, empty_board):
         board = empty_board
         board[7][4] = ("king", "white")
@@ -270,6 +306,15 @@ class TestKingAndCheck:
 
 
 class TestIsCheckMat:
+    def test_stalemate_not_checkmate(self, empty_board):
+        board = empty_board
+        # Roi noir en coin, roi blanc éloigné, dame blanche coupe les cases
+        board[7][7] = ("king", "black")
+        board[5][6] = ("queen", "white")
+        board[5][5] = ("king", "white")
+        # Le roi noir ne peut pas bouger mais il n'est pas en échec
+        assert not engine.is_check_mat(board, (7, 7))
+
     def test_not_checkmate_alone(self, empty_board):
         board = empty_board
         board[7][4] = ("king", "white")
