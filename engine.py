@@ -7,7 +7,7 @@ Type aliases:
 
 __author__ = "georgevdv"
 __version__ = "0.8.0"
-from typing import Optional, Tuple, TypedDict
+from typing import Optional, Tuple
 from copy import deepcopy
 import colorama as c
 
@@ -116,6 +116,7 @@ def print_board(board: Board) -> None:
     print("O a b c d e f g h")
 
 
+# TODO retirer tous les moves si en échec
 def list_valid_move(
     board: Board,
     cell: Position,
@@ -140,33 +141,32 @@ def list_valid_move(
     valid_moves = []
 
     if piece_type in ("pawnb", "pawnw"):
-        return list_valid_move_pawn(board, y, x, piece_type, piece_color)
-
-    repeat = PIECES[piece_type]["repeat"]
-    for dy, dx in PIECES[piece_type]["moves"]:
-        new_y, new_x = y + dy, x + dx
-        while 0 <= new_y <= 7 and 0 <= new_x <= 7:
-            target_piece, target_color = board[new_y][new_x]
-            if target_color == piece_color:
-                break
-            valid_moves.append((new_y, new_x))
-            if target_piece != VOID_CELL[0] or not repeat:
-                break
-            new_y += dy
-            new_x += dx
-    if piece_type == "king" and not ignore_king_safety:
+        valid_moves = list_valid_move_pawn(board, y, x, piece_type, piece_color)
+    else:
+        repeat = PIECES[piece_type]["repeat"]
+        for dy, dx in PIECES[piece_type]["moves"]:
+            new_y, new_x = y + dy, x + dx
+            while 0 <= new_y <= 7 and 0 <= new_x <= 7:
+                target_piece, target_color = board[new_y][new_x]
+                if target_color == piece_color:
+                    break
+                valid_moves.append((new_y, new_x))
+                if target_piece != VOID_CELL[0] or not repeat:
+                    break
+                new_y += dy
+                new_x += dx
+    if ignore_king_safety:
+        return valid_moves
+    else:
         safe_moves = []
         for new_y, new_x in valid_moves:
             sim_board = deepcopy(board)
-            sim_board[new_y][new_x], sim_board[y][x] = (
-                sim_board[y][x],
-                sim_board[new_y][new_x],
-            )
-            if not is_check(sim_board, (new_y, new_x)):
+            sim_board[new_y][new_x], sim_board[y][x] = sim_board[y][x], VOID_CELL
+
+            king_cell = find_king(sim_board, piece_color)
+            if king_cell and not is_check(sim_board, king_cell):
                 safe_moves.append((new_y, new_x))
         return safe_moves
-
-    return valid_moves
 
 
 # TODO : en passant bug 2 pions déplacé de 2
@@ -286,6 +286,16 @@ def is_check_mat(board: Board, cell: Position) -> bool:
 
 
 def is_stalemate(board: Board, cell: Position) -> bool:
+    """
+    return True if is stalemate else False
+
+    Args:
+        board (Board): game board
+        cell (Position): (y,x) cell
+
+    Returns:
+        bool: True if stalemate False otherwise
+    """
     if is_check(board, cell):
         return False
 
@@ -301,6 +311,14 @@ def is_stalemate(board: Board, cell: Position) -> bool:
 
 def is_rock(board: Board, cell: Position) -> bool:
     pass
+
+
+# regarder si roi à bouger dans historqiue regarder chaque case entre roi et tour si elle est en échec
+
+
+# dans list-valid_move rajouter la case pour rock
+
+# dans move piece regarder que si le roi veut bouger de sa case à celle spécial faire le rock
 
 
 def find_king(board: Board, color: str) -> Optional[Position]:
@@ -406,18 +424,8 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    # Pat : roi noir en h8, roi blanc en f7, dame blanche en g6
-
-    # board[7][7] = ("king", "white")
-    # board[6][6] = ("pawnw", "black")
-    # board[5][5] = ("king", "black")
-    # print(is_check(board, (7, 7)))
-    # print_board(board)
-    # print(is_check_mat(board, (7, 7)))
-
-    print("--------------------")
-    board[7][7] = ("king", "black")
-    board[5][6] = ("queen", "white")
-    board[5][5] = ("king", "white")
+    board[1][3] = ("pawnb", "black")
+    board[3][3] = ("pawnw", "white")
+    result = list_valid_move(board, (1, 3), ignore_king_safety=True)
     print_board(board)
-    print("ici", is_stalemate(board, (7, 7)))
+    print(result)

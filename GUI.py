@@ -75,6 +75,7 @@ def draw_grid():
 current_moove = []
 
 
+# TODO : ne pas ajouter cou si clique sur une puece à lui
 def move_piece_GUI():
     global canvas
 
