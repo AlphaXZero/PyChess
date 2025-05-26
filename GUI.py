@@ -302,8 +302,14 @@ def show_move(y, x, newy, newx, col):
     global GAME_TURN
     if engine.move_piece(current_board, y, x, newy, newx, col) is not None:
         engine.move_piece(current_board, y, x, newy, newx, col)
+        if engine.is_check_mat(
+            current_board, engine.find_king(current_board, color[((GAME_TURN + 1) % 2)])
+        ):
+            print(f"fini {col} a Gagné")
+
         GAME_TURN += 1
         update_turn_lab()
+
     draw_grid()
     draw_board()
 

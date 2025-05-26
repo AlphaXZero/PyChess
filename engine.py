@@ -434,10 +434,10 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[0][0] = ("king", "black")
-    board[0][2] = ("king", "white")
-    board[4][4] = ("rook", "white")
-    board[6][4] = ("pawnw", "white")
+    board[4][4] = ("king", "white")
+    board[3][0] = ("rook", "black")
+    board[5][0] = ("rook", "black")
+    board[4][0] = ("rook", "black")
+    board[5][1] = ("pawnw", "white")
     print_board(board)
-    a = move_piece(board, 4, 4, 6, 4, "white")
-    print(a)
+    print(is_check_mat(board, (4, 4)))

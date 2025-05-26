@@ -1,5 +1,14 @@
 import pytest
-from engine import list_valid_move, VOID_CELL, Board, HISTORY, move_piece
+from engine import (
+    list_valid_move,
+    VOID_CELL,
+    Board,
+    HISTORY,
+    move_piece,
+    is_check,
+    is_check_mat,
+    is_stalemate,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -536,3 +545,83 @@ class TestMovePiece:
         board[6][3] = ("pawnw", "white")
         invalid = move_piece(board, 6, 3, 5, 3, "white")
         assert invalid is None
+
+
+class TestIsCheck:
+    def test_king_not_in_check(self):
+        board = empty_board()
+        board[7][4] = ("king", "white")
+        result = is_check(board, (7, 4))
+        assert result == []
+
+    def test_king_in_check_by_rook(self):
+        board = empty_board()
+        board[7][4] = ("king", "white")
+        board[5][4] = ("rook", "black")
+        result = is_check(board, (7, 4))
+        assert (5, 4) in result
+        assert len(result) == 1
+
+    def test_king_in_check_by_multiple(self):
+        board = empty_board()
+        board[7][4] = ("king", "white")
+        board[5][4] = ("rook", "black")
+        board[6][3] = ("bishop", "black")
+        result = is_check(board, (7, 4))
+        assert (5, 4) in result
+        assert (6, 3) in result
+        assert len(result) == 2
+
+    def test_king_in_check_by_knight(self):
+        board = empty_board()
+        board[4][4] = ("king", "white")
+        board[2][5] = ("knight", "black")
+        result = is_check(board, (4, 4))
+        assert (2, 5) in result
+        assert len(result) == 1
+
+
+class TestIsCheckMat:
+    def test_pawn_can_block_check_mate(self):
+        board = empty_board()
+        board[4][4] = ("king", "white")
+        board[3][0] = ("rook", "black")
+        board[5][0] = ("rook", "black")
+        board[4][0] = ("rook", "black")
+        board[5][1] = ("pawnw", "white")
+        assert not is_check_mat(board, (4, 4))
+
+    def test_king_in_double_rook_checkmate(self):
+        board = empty_board()
+        board[7][7] = ("king", "white")
+        board[0][0] = ("king", "black")
+        board[6][5] = ("rook", "black")
+        board[7][1] = ("rook", "black")
+        assert is_check_mat(board, (7, 7))
+
+    def test_king_can_escape(self):
+        board = empty_board()
+        board[4][4] = ("king", "white")
+        board[2][5] = ("knight", "black")
+        assert not is_check_mat(board, (4, 4))
+
+
+class TestIsStalemate:
+    def test_not_stalemate_if_in_check(self):
+        board = empty_board()
+        board[7][4] = ("king", "white")
+        board[5][4] = ("rook", "black")
+        assert not is_stalemate(board, (7, 4))
+
+    def test_not_stalemate_if_moves_available(self):
+        board = empty_board()
+        board[4][4] = ("king", "white")
+        board[2][5] = ("knight", "black")
+        assert not is_stalemate(board, (4, 4))
+
+    def test_stalemate_position(self):
+        board = empty_board()
+        board[0][0] = ("king", "white")
+        board[2][1] = ("queen", "black")
+        board[1][2] = ("king", "black")
+        assert is_stalemate(board, (0, 0))
