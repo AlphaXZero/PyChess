@@ -107,9 +107,19 @@ def print_board(board: Board) -> None:
         print(8 - i, end=" ")
         for cell in line:
             if cell[1] == "white":
-                print(c.Back.WHITE + cell[0][0] + c.Style.RESET_ALL, end=" ")
+                print(
+                    c.Back.WHITE
+                    + (cell[0][0] if cell[0] != "king" else "R")
+                    + c.Style.RESET_ALL,
+                    end=" ",
+                )
             elif cell[1] == "black":
-                print(c.Back.BLUE + cell[0][0] + c.Style.RESET_ALL, end=" ")
+                print(
+                    c.Back.BLUE
+                    + (cell[0][0] if cell[0] != "king" else "R")
+                    + c.Style.RESET_ALL,
+                    end=" ",
+                )
             else:
                 print(cell[0][0], end=" ")
         print()
@@ -424,8 +434,10 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[1][3] = ("pawnb", "black")
-    board[3][3] = ("pawnw", "white")
-    result = list_valid_move(board, (1, 3), ignore_king_safety=True)
+    board[0][0] = ("king", "black")
+    board[0][2] = ("king", "white")
+    board[4][4] = ("rook", "white")
+    board[6][4] = ("pawnw", "white")
     print_board(board)
-    print(result)
+    a = move_piece(board, 4, 4, 6, 4, "white")
+    print(a)
