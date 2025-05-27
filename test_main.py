@@ -8,6 +8,7 @@ from engine import (
     is_check,
     is_check_mat,
     is_stalemate,
+    is_castling,
 )
 
 
@@ -639,3 +640,48 @@ class TestIsStalemate:
         board[2][1] = ("queen", "black")
         board[1][2] = ("king", "black")
         assert is_stalemate(board, (0, 0))
+
+
+class TestIsCastling:
+    def test_black_king_can_castle_both_side_white_king_cant_castle(self):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawn", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        assert is_castling(board, "white") == []
+        assert is_castling(board, "black") == ["left", "right"]
+
+    def test_black_king_cant_castle_because_moved_white_can_castle_left(self):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawnw", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board = move_piece(board, 7, 1, 6, 1, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 1, 5, 1, "white")
+        board = move_piece(board, 0, 3, 0, 4, "black")
+        assert is_castling(board, "white") == ["left"]
+        assert is_castling(board, "black") == []
+
+    def test_white_cant_castle_left_because_rook_moved(self):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawnw", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board = move_piece(board, 7, 1, 6, 1, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 1, 5, 1, "white")
+        board = move_piece(board, 0, 3, 0, 4, "black")
+        board = move_piece(board, 7, 0, 6, 0, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 0, 7, 0, "white")
+        assert is_castling(board, "white") == []

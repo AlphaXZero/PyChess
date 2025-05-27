@@ -298,6 +298,7 @@ def draw_piece(piece, x, y):
 
 def show_move(y, x, newy, newx, col):
     global GAME_TURN
+
     if engine.move_piece(current_board, y, x, newy, newx, col) is not None:
         engine.move_piece(current_board, y, x, newy, newx, col)
         if engine.is_check_mat(
@@ -306,7 +307,9 @@ def show_move(y, x, newy, newx, col):
             print(f"fini {col} a Gagné")
         GAME_TURN += 1
         update_turn_lab()
-    print(engine.HISTORY)
+        print(color[(GAME_TURN) % 2])
+        print(engine.is_castling(current_board, color[(GAME_TURN) % 2]))
+
     draw_grid()
     draw_board()
 

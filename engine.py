@@ -97,7 +97,7 @@ board: Board = [
 
 def print_board(board: Board) -> None:
     """
-    Print the game board to the console.
+    Print the game board to the console. (used for testing)
 
     Args:
         board (Board): The chess board to display.
@@ -193,7 +193,7 @@ def list_valid_move_pawn(
 
     Returns:
         list[Position]: A list of cells (row, column) where the pawn can move.
-    """
+    """  # TODO retirer tous les moves si en échec
     move_list = []
     bound = 6 if piece_color == "white" else 1
     direction = (-1) if piece_color == "white" else 1
@@ -317,8 +317,39 @@ def is_stalemate(board: Board, cell: Position) -> bool:
     return True
 
 
-def is_rock(board: Board, cell: Position) -> bool:
-    pass
+def is_castling(board: Board, color: str) -> bool:
+    poss = []
+    player_turn = 0 if color == "white" else 1
+    y, x = find_king(board, color)
+    for i, h in enumerate(HISTORY):
+        if h["piece_symbol"] == "king" and i % 2 == player_turn:
+            return poss
+    if board[y][0][0] == "rook" and board[y][1:x] == [VOID_CELL] * (x - 1):
+        flag = True
+        for i, h in enumerate(HISTORY):
+            if (
+                h["piece_symbol"] == "rook"
+                and h["cell"] == (y, 0)
+                and i % 2 == player_turn
+            ):
+                flag = False
+                break
+        if flag:
+            poss.append("left")
+    if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
+        flag = True
+        for i, h in enumerate(HISTORY):
+            if (
+                h["piece_symbol"] == "rook"
+                and h["cell"] == (y, 7)
+                and i % 2 == player_turn
+            ):
+                flag = False
+                break
+        if flag:
+            poss.append("right")
+
+    return poss
 
 
 # regarder si roi à bouger dans historqiue regarder chaque case entre roi et tour si elle est en échec
@@ -429,15 +460,20 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[7][7] = ("king", "white")
-    board[1][1] = ("king", "black")
-    board[0][1] = ("pawnb", "black")
-    board[0][0] = ("pawnb", "black")
-    board[0][2] = ("pawnb", "black")
-    board[1][0] = ("pawnb", "black")
-    board[1][2] = ("pawnb", "black")
-    board[2][0] = ("pawnb", "black")
-    board[2][1] = ("pawnb", "black")
-    board[2][2] = ("pawnb", "black")
+    board[7][0] = ("rook", "white")
+    board[7][3] = ("king", "white")
+    board[7][1] = ("pawnw", "white")
+    board[0][0] = ("rook", "black")
+    board[0][4] = ("king", "black")
+    board[0][7] = ("rook", "black")
+    board[7][7] = ("rook", "white")
+    board = move_piece(board, 7, 1, 6, 1, "white")
+    board = move_piece(board, 0, 4, 0, 3, "black")
+    board = move_piece(board, 6, 1, 5, 1, "white")
+    board = move_piece(board, 0, 3, 0, 4, "black")
+    board = move_piece(board, 7, 7, 6, 7, "white")
+    board = move_piece(board, 0, 4, 0, 3, "black")
+    board = move_piece(board, 6, 7, 7, 7, "white")
     print_board(board)
-    print(is_check_mat(board, (1, 1)))
+    print("w -> ", is_castling(board, "white"))
+    print("b -> ", is_castling(board, "black"))
