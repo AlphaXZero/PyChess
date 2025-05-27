@@ -127,6 +127,7 @@ def list_valid_move(
     cell: Position,
     specific_piece: Optional[str] = None,
     ignore_king_safety: bool = False,
+    only_control=None,
 ) -> list[Position]:
     """
     List all valid moves for the piece at a given cell on the board.
@@ -178,11 +179,7 @@ def list_valid_move(
 
 
 def list_valid_move_pawn(
-    board: Board,
-    y: int,
-    x: int,
-    piece_type: str,
-    piece_color: str,
+    board: Board, y: int, x: int, piece_type: str, piece_color: str, only_control=None
 ) -> list[Position]:
     """
     List all valid moves for a pawn at the given position.
@@ -196,7 +193,7 @@ def list_valid_move_pawn(
 
     Returns:
         list[Position]: A list of cells (row, column) where the pawn can move.
-    """  # TODO retirer tous les moves si en échec
+    """
     move_list = []
     bound = 6 if piece_color == "white" else 1
     direction = (-1) if piece_color == "white" else 1
@@ -215,9 +212,8 @@ def list_valid_move_pawn(
             elif i != 0:
                 en_passant_bound = 3 if "white" == piece_color else 4
 
-                if (
-                    board[new_y][new_x][1] != piece_color
-                    and board[new_y][new_x] != VOID_CELL
+                if board[new_y][new_x][1] != piece_color and (
+                    board[new_y][new_x] != VOID_CELL
                 ):
                     move_list.append((new_y, new_x))
                 if (
@@ -264,9 +260,22 @@ def is_check(board: Board, cell: Position, color=None) -> list[Position]:
         for n_x in range(8):
             if board[n_y][n_x][1] != piece_color:
                 if (y, x) in list_valid_move(
-                    board, (n_y, n_x), ignore_king_safety=True
+                    board, (n_y, n_x), ignore_king_safety=True, only_control=True
                 ):
                     checking_cells.append((n_y, n_x))
+    return checking_cells
+
+
+def is_check2(board: Board, cell: Position, color=None) -> list[Position]:
+    y, x = cell
+    checking_cells = []
+    piece_color = color or board[y][x][1]
+    for i in PIECES.keys():
+        for n_y, n_x in list_valid_move(
+            board, cell, i, ignore_king_safety=True, only_control=True
+        ):
+            if board[n_y][n_x][0] == i and piece_color != board[n_y][n_x][1]:
+                checking_cells.append((n_y, n_x))
     return checking_cells
 
 
@@ -340,8 +349,6 @@ def is_castling(board: Board, color: str) -> bool:
                 break
         for i in range(5):
             # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
-            if i != 0 and i != 4:
-                board[y][i] = ("bishop", color)
             if is_check(board, (y, 0 + i), color) != []:
                 flag = False
                 break
@@ -360,8 +367,6 @@ def is_castling(board: Board, color: str) -> bool:
                 break
         for i in range(4):
             # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
-            if i != 0 and i != 3:
-                board[y][4 + i] = ("bishop", color)
             if is_check(board, (y, 4 + i), color) != []:
                 flag = False
                 break
@@ -369,14 +374,6 @@ def is_castling(board: Board, color: str) -> bool:
             poss.append((y, 4 + len(board[y][1:x]) - 1))
 
     return poss
-
-
-# regarder si roi à bouger dans historqiue regarder chaque case entre roi et tour si elle est en échec
-
-
-# dans list-valid_move rajouter la case pour rock
-
-# dans move piece regarder que si le roi veut bouger de sa case à celle spécial faire le rock
 
 
 def find_king(board: Board, color: str) -> Optional[Position]:
@@ -478,21 +475,10 @@ def format_history(history: list[dict[str]]) -> list[str]:
     text_history = []
     for item in history:
         text_history.append(
-            f"{item['piece_symbol']}{X_NAME[item['cell'][1]]}{8 - item['cell'][0]}->{X_NAME[item['new_cell'][1]]}{X_NAME[item['new_cell'][0]]}"
+            f"{item['piece_symbol']} {X_NAME[item['cell'][1]]}{8 - item['cell'][0]} -> {X_NAME[item['new_cell'][1]]}{8 - item['new_cell'][0]}"
         )
     return text_history
 
 
 if __name__ == "__main__":
-    board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-
-    board[7][0] = ("rook", "white")
-    board[7][3] = ("king", "white")
-    board[0][0] = ("rook", "black")
-    board[0][4] = ("king", "black")
-    board[0][7] = ("rook", "black")
-    board[6][0] = ("pawnb", "black")
-    print_board(board)
-    print(is_check(board, (7, 1)))
-    print("w -> ", is_castling(board, "white"))
-    print("b -> ", is_castling(board, "black"))
+    pass

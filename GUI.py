@@ -307,9 +307,7 @@ def show_move(y, x, newy, newx, col):
             print(f"fini {col} a Gagné")
         GAME_TURN += 1
         update_turn_lab()
-        print(color[(GAME_TURN) % 2])
-        print(engine.is_castling(current_board, color[(GAME_TURN) % 2]))
-
+        print(engine.format_history(engine.HISTORY))
     draw_grid()
     draw_board()
 
