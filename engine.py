@@ -86,8 +86,8 @@ board: Board = [
         ("rook", "white"),
         ("knight", "white"),
         ("bishop", "white"),
-        ("king", "white"),
         ("queen", "white"),
+        ("king", "white"),
         ("bishop", "white"),
         ("knight", "white"),
         ("rook", "white"),
@@ -119,7 +119,7 @@ def print_board(board: Board) -> None:
             else:
                 print(cell[0][0], end=" ")
         print()
-    print("O a b c d e f g h")
+    print("  a b c d e f g h")
 
 
 def list_valid_move(
@@ -171,6 +171,9 @@ def list_valid_move(
             king_cell = find_king(sim_board, piece_color)
             if king_cell and not is_check(sim_board, king_cell):
                 safe_moves.append((new_y, new_x))
+        if piece_type == "king":
+            castling_positions = is_castling(board, piece_color)
+            safe_moves.extend(castling_positions)
         return safe_moves
 
 
@@ -243,7 +246,7 @@ def promote_pawn(board: Board, cell: Position) -> None:
 
 
 # TODO changer pour autre bersion je pense
-def is_check(board: Board, cell: Position) -> list[Position]:
+def is_check(board: Board, cell: Position, color=None) -> list[Position]:
     """
     Return the positions of pieces that are checking the given cell.
 
@@ -256,7 +259,7 @@ def is_check(board: Board, cell: Position) -> list[Position]:
     """
     y, x = cell
     checking_cells = []
-    piece_color = board[y][x][1]
+    piece_color = color or board[y][x][1]
     for n_y in range(8):
         for n_x in range(8):
             if board[n_y][n_x][1] != piece_color:
@@ -324,6 +327,7 @@ def is_castling(board: Board, color: str) -> bool:
     for i, h in enumerate(HISTORY):
         if h["piece_symbol"] == "king" and i % 2 == player_turn:
             return poss
+    # left
     if board[y][0][0] == "rook" and board[y][1:x] == [VOID_CELL] * (x - 1):
         flag = True
         for i, h in enumerate(HISTORY):
@@ -334,8 +338,16 @@ def is_castling(board: Board, color: str) -> bool:
             ):
                 flag = False
                 break
+        for i in range(5):
+            # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
+            if i != 0 and i != 4:
+                board[y][i] = ("bishop", color)
+            if is_check(board, (y, 0 + i), color) != []:
+                flag = False
+                break
         if flag:
-            poss.append("left")
+            poss.append((y, len(board[y][1:x]) - 1))
+    # right
     if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
         flag = True
         for i, h in enumerate(HISTORY):
@@ -346,8 +358,15 @@ def is_castling(board: Board, color: str) -> bool:
             ):
                 flag = False
                 break
+        for i in range(4):
+            # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
+            if i != 0 and i != 3:
+                board[y][4 + i] = ("bishop", color)
+            if is_check(board, (y, 4 + i), color) != []:
+                flag = False
+                break
         if flag:
-            poss.append("right")
+            poss.append((y, 4 + len(board[y][1:x]) - 1))
 
     return poss
 
@@ -414,6 +433,12 @@ def move_piece(
         ):
             direction = 1 if color == "white" else -1
             board[new_y + direction][new_x] = VOID_CELL
+
+        if board[y][x][0] == "king" and abs(new_x - x) == 2:
+            if new_x == 2:
+                board[y][0], board[y][3] = board[y][3], board[y][0]
+            else:
+                board[y][7], board[y][5] = board[y][5], board[y][7]
         board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
 
@@ -460,20 +485,14 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
+
     board[7][0] = ("rook", "white")
     board[7][3] = ("king", "white")
-    board[7][1] = ("pawnw", "white")
     board[0][0] = ("rook", "black")
     board[0][4] = ("king", "black")
     board[0][7] = ("rook", "black")
-    board[7][7] = ("rook", "white")
-    board = move_piece(board, 7, 1, 6, 1, "white")
-    board = move_piece(board, 0, 4, 0, 3, "black")
-    board = move_piece(board, 6, 1, 5, 1, "white")
-    board = move_piece(board, 0, 3, 0, 4, "black")
-    board = move_piece(board, 7, 7, 6, 7, "white")
-    board = move_piece(board, 0, 4, 0, 3, "black")
-    board = move_piece(board, 6, 7, 7, 7, "white")
+    board[6][0] = ("pawnb", "black")
     print_board(board)
+    print(is_check(board, (7, 1)))
     print("w -> ", is_castling(board, "white"))
     print("b -> ", is_castling(board, "black"))

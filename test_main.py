@@ -643,18 +643,9 @@ class TestIsStalemate:
 
 
 class TestIsCastling:
-    def test_black_king_can_castle_both_side_white_king_cant_castle(self):
-        board = empty_board()
-        board[7][0] = ("rook", "white")
-        board[7][3] = ("king", "white")
-        board[7][1] = ("pawn", "white")
-        board[0][0] = ("rook", "black")
-        board[0][4] = ("king", "black")
-        board[0][7] = ("rook", "black")
-        assert is_castling(board, "white") == []
-        assert is_castling(board, "black") == ["left", "right"]
-
-    def test_black_king_cant_castle_because_moved_white_can_castle_left(self):
+    def test_black_can_castle_both_side_white_cant_castle_because_own_pawn_blocking(
+        self,
+    ):
         board = empty_board()
         board[7][0] = ("rook", "white")
         board[7][3] = ("king", "white")
@@ -662,11 +653,42 @@ class TestIsCastling:
         board[0][0] = ("rook", "black")
         board[0][4] = ("king", "black")
         board[0][7] = ("rook", "black")
+        board[6][0] = ("pawnw", "white")
+        assert is_castling(board, "white") == []
+        assert is_castling(board, "black") == [(0, 2), (0, 6)]
+
+    def test_black_cant_castle_because_moved_white_can_castle_left(self):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawnw", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board[6][0] = ("pawnw", "white")
         board = move_piece(board, 7, 1, 6, 1, "white")
         board = move_piece(board, 0, 4, 0, 3, "black")
         board = move_piece(board, 6, 1, 5, 1, "white")
         board = move_piece(board, 0, 3, 0, 4, "black")
-        assert is_castling(board, "white") == ["left"]
+        assert is_castling(board, "white") == [(7, 1)]
+        assert is_castling(board, "black") == []
+
+    def test_black_cant_castle_beacause_moved_white_cant_castle_beacause_pawnb_controll_cell(
+        self,
+    ):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawnw", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board[6][0] = ("pawnb", "black")
+        board = move_piece(board, 7, 1, 6, 1, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 1, 5, 1, "white")
+        board = move_piece(board, 0, 3, 0, 4, "black")
+        assert is_castling(board, "white") == []
         assert is_castling(board, "black") == []
 
     def test_white_cant_castle_left_because_rook_moved(self):
@@ -685,3 +707,39 @@ class TestIsCastling:
         board = move_piece(board, 0, 4, 0, 3, "black")
         board = move_piece(board, 6, 0, 7, 0, "white")
         assert is_castling(board, "white") == []
+
+    def test_white_can_castle_left_cant_castle_right_because_rook_moved_black_cant_castle_because_king_moved(
+        self,
+    ):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[7][1] = ("pawnw", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board[7][7] = ("rook", "white")
+        board[4][0] = ("pawnw", "white")
+        board[4][7] = ("pawnw", "white")
+        board = move_piece(board, 7, 1, 6, 1, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 1, 5, 1, "white")
+        board = move_piece(board, 0, 3, 0, 4, "black")
+        board = move_piece(board, 7, 7, 6, 7, "white")
+        board = move_piece(board, 0, 4, 0, 3, "black")
+        board = move_piece(board, 6, 7, 7, 7, "white")
+        assert is_castling(board, "white") == [(7, 1)]
+        assert is_castling(board, "black") == []
+
+    def test_both_king_can_castle_in_both_side(self):
+        board = empty_board()
+        board[7][0] = ("rook", "white")
+        board[7][3] = ("king", "white")
+        board[0][0] = ("rook", "black")
+        board[0][4] = ("king", "black")
+        board[0][7] = ("rook", "black")
+        board[7][7] = ("rook", "white")
+        board[4][0] = ("pawnw", "white")
+        board[4][7] = ("pawnw", "white")
+        assert is_castling(board, "white") == [(7, 1), (7, 5)]
+        assert is_castling(board, "black") == [(0, 2), (0, 6)]
