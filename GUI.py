@@ -113,7 +113,6 @@ def get_clicked_cell1(event):
     check_white = engine.is_check(
         current_board, engine.find_king(current_board, "white")
     )
-    print(check_white)
     # TODO:séparer
     for i in check_white:
         draw_warn_circles(i)
@@ -121,7 +120,6 @@ def get_clicked_cell1(event):
     check_black = engine.is_check(
         current_board, engine.find_king(current_board, "black")
     )
-    print(check_black)
     # TODO:séparer + pion bug pour roi blanc
     for i in check_black:
         draw_warn_circles(i)
@@ -306,10 +304,9 @@ def show_move(y, x, newy, newx, col):
             current_board, engine.find_king(current_board, color[((GAME_TURN + 1) % 2)])
         ):
             print(f"fini {col} a Gagné")
-
         GAME_TURN += 1
         update_turn_lab()
-
+    print(engine.HISTORY)
     draw_grid()
     draw_board()
 

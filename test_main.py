@@ -582,6 +582,20 @@ class TestIsCheck:
 
 
 class TestIsCheckMat:
+    def test_king_not_checked_but_cant_move(self):
+        board = empty_board()
+        board[7][7] = ("king", "white")
+        board[1][1] = ("king", "black")
+        board[0][1] = ("pawnb", "black")
+        board[0][0] = ("pawnb", "black")
+        board[0][2] = ("pawnb", "black")
+        board[1][0] = ("pawnb", "black")
+        board[1][2] = ("pawnb", "black")
+        board[2][0] = ("pawnb", "black")
+        board[2][1] = ("pawnb", "black")
+        board[2][2] = ("pawnb", "black")
+        assert not is_check_mat(board, (1, 1))
+
     def test_pawn_can_block_check_mate(self):
         board = empty_board()
         board[4][4] = ("king", "white")

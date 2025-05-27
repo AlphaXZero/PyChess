@@ -108,16 +108,12 @@ def print_board(board: Board) -> None:
         for cell in line:
             if cell[1] == "white":
                 print(
-                    c.Back.WHITE
-                    + (cell[0][0] if cell[0] != "king" else "R")
-                    + c.Style.RESET_ALL,
+                    c.Back.WHITE + (cell[0][0]) + c.Style.RESET_ALL,
                     end=" ",
                 )
             elif cell[1] == "black":
                 print(
-                    c.Back.BLUE
-                    + (cell[0][0] if cell[0] != "king" else "R")
-                    + c.Style.RESET_ALL,
+                    c.Back.BLUE + (cell[0][0]) + c.Style.RESET_ALL,
                     end=" ",
                 )
             else:
@@ -126,7 +122,6 @@ def print_board(board: Board) -> None:
     print("O a b c d e f g h")
 
 
-# TODO retirer tous les moves si en échec
 def list_valid_move(
     board: Board,
     cell: Position,
@@ -179,7 +174,6 @@ def list_valid_move(
         return safe_moves
 
 
-# TODO : en passant bug 2 pions déplacé de 2
 def list_valid_move_pawn(
     board: Board,
     y: int,
@@ -221,14 +215,16 @@ def list_valid_move_pawn(
                 if (
                     board[new_y][new_x][1] != piece_color
                     and board[new_y][new_x] != VOID_CELL
-                ) or (
+                ):
+                    move_list.append((new_y, new_x))
+                if (
                     y == en_passant_bound
                     and board[new_y - direction][new_x][0][:-1] == "pawn"
                     and board[new_y - direction][new_x][1] != piece_color
                     and len(HISTORY) != 0
                     and abs(HISTORY[-1]["cell"][0] - HISTORY[-1]["new_cell"][0]) == 2
                 ):
-                    move_list.append((new_y, new_x))
+                    move_list.append((new_y, HISTORY[-1]["new_cell"][1]))
     return move_list
 
 
@@ -284,6 +280,8 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     """
     y, x = cell
     piece_color = board[y][x][1]
+    if is_check(board, (y, x)) == []:
+        return False
     for move in PIECES[board[y][x][0]]["moves"]:
         new_y, new_x = y + move[0], x + move[1]
         board_test = deepcopy(board)
@@ -380,6 +378,7 @@ def move_piece(
             len(HISTORY) >= 2
             and HISTORY[-1]["piece_symbol"][0] == "p"
             and HISTORY[-2]["piece_symbol"][0] == "p"
+            and HISTORY[-2]["cell"][1] != HISTORY[-1]["cell"][1]
             and HISTORY[-2]["new_cell"][1] == HISTORY[-1]["new_cell"][1]
         ):
             direction = 1 if color == "white" else -1
@@ -392,7 +391,6 @@ def move_piece(
     return board
 
 
-# TODO regarder si autre piece peut aller là-bas pour enlever le y,x
 def update_history(
     history: list[dict], board: Board, cell: Position, new_cell: Position
 ) -> list[dict]:
@@ -408,13 +406,10 @@ def update_history(
     Returns:
         list[str]: updated history with the move added
     """
-    y, x = 8 - cell[0], X_NAME[cell[1]]
-    n_y, n_x = 8 - new_cell[0], X_NAME[new_cell[1]]
+    y, x = cell
+    n_y, n_x = new_cell
     piece = board[cell[0]][cell[1]][0]
-    piece_symbol = piece[0] if piece[0] != "p" else piece[0] + piece[-1]
-    history.append(
-        {"piece_symbol": piece_symbol, "cell": (y, x), "new_cell": (n_y, n_x)}
-    )
+    history.append({"piece_symbol": piece, "cell": (y, x), "new_cell": (n_y, n_x)})
     return history
 
 
@@ -427,17 +422,22 @@ def format_history(history: list[dict[str]]) -> list[str]:
     text_history = []
     for item in history:
         text_history.append(
-            f"{item['piece_symbol']}{item['cell'][1]}{item['cell'][0]}->{item['new_cell'][1]}{item['new_cell'][0]}"
+            f"{item['piece_symbol']}{X_NAME[item['cell'][1]]}{8 - item['cell'][0]}->{X_NAME[item['new_cell'][1]]}{X_NAME[item['new_cell'][0]]}"
         )
     return text_history
 
 
 if __name__ == "__main__":
     board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[4][4] = ("king", "white")
-    board[3][0] = ("rook", "black")
-    board[5][0] = ("rook", "black")
-    board[4][0] = ("rook", "black")
-    board[5][1] = ("pawnw", "white")
+    board[7][7] = ("king", "white")
+    board[1][1] = ("king", "black")
+    board[0][1] = ("pawnb", "black")
+    board[0][0] = ("pawnb", "black")
+    board[0][2] = ("pawnb", "black")
+    board[1][0] = ("pawnb", "black")
+    board[1][2] = ("pawnb", "black")
+    board[2][0] = ("pawnb", "black")
+    board[2][1] = ("pawnb", "black")
+    board[2][2] = ("pawnb", "black")
     print_board(board)
-    print(is_check_mat(board, (4, 4)))
+    print(is_check_mat(board, (1, 1)))
