@@ -8,7 +8,7 @@ from engine import (
     is_check,
     is_check_mat,
     is_stalemate,
-    is_castling,
+    list_valid_castling,
 )
 
 
@@ -440,7 +440,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[4][4] = ("knight", "white")
-        new_board = move_piece(board, 4, 4, 6, 5, "white")
+        new_board = move_piece(board, (4, 4), (6, 5), "white")
         assert new_board is not None
         assert new_board[6][5] == ("knight", "white")
         assert new_board[4][4] == VOID_CELL
@@ -450,7 +450,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[4][4] = ("knight", "white")
-        result = move_piece(board, 4, 4, 6, 5, "black")
+        result = move_piece(board, (4, 4), (6, 5), "black")
         assert result is None
 
     def test_cannot_move_to_same_color(self):
@@ -459,7 +459,7 @@ class TestMovePiece:
         board[0][2] = ("king", "white")
         board[4][4] = ("rook", "white")
         board[6][4] = ("pawnw", "white")
-        result = move_piece(board, 4, 4, 6, 4, "white")
+        result = move_piece(board, (4, 4), (6, 4), "white")
         assert result is None
 
     def test_move_invalid_destination(self):
@@ -467,7 +467,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[4][4] = ("bishop", "white")
-        result = move_piece(board, 4, 4, 4, 3, "white")
+        result = move_piece(board, (4, 4), (4, 3), "white")
         assert result is None
 
     def test_capture_enemy_piece(self):
@@ -476,7 +476,7 @@ class TestMovePiece:
         board[0][2] = ("king", "white")
         board[3][3] = ("rook", "white")
         board[3][7] = ("pawnw", "black")
-        new_board = move_piece(board, 3, 3, 3, 7, "white")
+        new_board = move_piece(board, (3, 3), (3, 7), "white")
         assert new_board is not None
         assert new_board[3][7] == ("rook", "white")
         assert new_board[3][3] == VOID_CELL
@@ -486,7 +486,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[1][7] = ("pawnw", "white")
-        new_board = move_piece(board, 1, 7, 0, 7, "white")
+        new_board = move_piece(board, (1, 7), (0, 7), "white")
         assert new_board is not None
         assert new_board[0][7][0] == "queen"
         assert new_board[0][7][1] == "white"
@@ -496,7 +496,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[6][7] = ("pawnb", "black")
-        new_board = move_piece(board, 6, 7, 7, 7, "black")
+        new_board = move_piece(board, (6, 7), (7, 7), "black")
         assert new_board is not None
         assert new_board[7][7][0] == "queen"
         assert new_board[7][7][1] == "black"
@@ -506,7 +506,7 @@ class TestMovePiece:
         board[0][0] = ("king", "black")
         board[0][2] = ("king", "white")
         board[6][3] = ("pawnw", "white")
-        new_board = move_piece(board, 6, 3, 4, 3, "white")
+        new_board = move_piece(board, (6, 3), (4, 3), "white")
         assert new_board is not None
         assert new_board[4][3] == ("pawnw", "white")
         assert new_board[6][3] == VOID_CELL
@@ -517,8 +517,8 @@ class TestMovePiece:
         board[0][2] = ("king", "white")
         board[3][4] = ("pawnb", "black")
         board[6][5] = ("pawnw", "white")
-        move_piece(board, 6, 5, 4, 5, "white")
-        new_board = move_piece(board, 3, 4, 4, 5, "black")
+        move_piece(board, (6, 5), (4, 5), "white")
+        new_board = move_piece(board, (3, 4), (4, 5), "black")
         assert new_board is not None
         assert new_board[4][5] == ("pawnb", "black")
         assert new_board[3][4] == VOID_CELL
@@ -527,7 +527,7 @@ class TestMovePiece:
     def test_illegal_move_does_not_update_board(self):
         board = empty_board()
         board[4][4] = ("rook", "white")
-        result = move_piece(board, 4, 4, 5, 5, "white")  # Invalid for rook
+        result = move_piece(board, (4, 4), (5, 5), "white")  # Invalid for rook
         assert result is None
         assert board[4][4] == ("rook", "white")
 
@@ -536,7 +536,7 @@ class TestMovePiece:
         board[7][4] = ("king", "white")
         board[5][4] = ("rook", "black")
         board[6][3] = ("pawnw", "white")
-        valid = move_piece(board, 6, 3, 5, 4, "white")
+        valid = move_piece(board, (6, 3), (5, 4), "white")
         assert valid is not None
         assert valid[5][4] == ("pawnw", "white")
         assert valid[6][3] == VOID_CELL
@@ -544,7 +544,7 @@ class TestMovePiece:
         board[7][4] = ("king", "white")
         board[5][4] = ("rook", "black")
         board[6][3] = ("pawnw", "white")
-        invalid = move_piece(board, 6, 3, 5, 3, "white")
+        invalid = move_piece(board, (6, 3), (5, 3), "white")
         assert invalid is None
 
 
@@ -654,8 +654,8 @@ class TestIsCastling:
         board[0][4] = ("king", "black")
         board[0][7] = ("rook", "black")
         board[6][0] = ("pawnw", "white")
-        assert is_castling(board, "white") == []
-        assert is_castling(board, "black") == [(0, 2), (0, 6)]
+        assert list_valid_castling(board, "white") == []
+        assert list_valid_castling(board, "black") == [(0, 2), (0, 6)]
 
     def test_black_cant_castle_because_moved_white_can_castle_left(self):
         board = empty_board()
@@ -666,12 +666,12 @@ class TestIsCastling:
         board[0][4] = ("king", "black")
         board[0][7] = ("rook", "black")
         board[6][0] = ("pawnw", "white")
-        board = move_piece(board, 7, 1, 6, 1, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 1, 5, 1, "white")
-        board = move_piece(board, 0, 3, 0, 4, "black")
-        assert is_castling(board, "white") == [(7, 1)]
-        assert is_castling(board, "black") == []
+        board = move_piece(board, (7, 1), (6, 1), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 1), (5, 1), "white")
+        board = move_piece(board, (0, 3), (0, 4), "black")
+        assert list_valid_castling(board, "white") == [(7, 1)]
+        assert list_valid_castling(board, "black") == []
 
     def test_black_cant_castle_beacause_moved_white_cant_castle_beacause_pawnb_controll_cell(
         self,
@@ -684,12 +684,12 @@ class TestIsCastling:
         board[0][4] = ("king", "black")
         board[0][7] = ("rook", "black")
         board[6][0] = ("pawnb", "black")
-        board = move_piece(board, 7, 1, 6, 1, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 1, 5, 1, "white")
-        board = move_piece(board, 0, 3, 0, 4, "black")
-        assert is_castling(board, "white") == []
-        assert is_castling(board, "black") == []
+        board = move_piece(board, (7, 1), (6, 1), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 1), (5, 1), "white")
+        board = move_piece(board, (0, 3), (0, 4), "black")
+        assert list_valid_castling(board, "white") == []
+        assert list_valid_castling(board, "black") == []
 
     def test_white_cant_castle_left_because_rook_moved(self):
         board = empty_board()
@@ -699,14 +699,14 @@ class TestIsCastling:
         board[0][0] = ("rook", "black")
         board[0][4] = ("king", "black")
         board[0][7] = ("rook", "black")
-        board = move_piece(board, 7, 1, 6, 1, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 1, 5, 1, "white")
-        board = move_piece(board, 0, 3, 0, 4, "black")
-        board = move_piece(board, 7, 0, 6, 0, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 0, 7, 0, "white")
-        assert is_castling(board, "white") == []
+        board = move_piece(board, (7, 1), (6, 1), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 1), (5, 1), "white")
+        board = move_piece(board, (0, 3), (0, 4), "black")
+        board = move_piece(board, (7, 0), (6, 0), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 0), (7, 0), "white")
+        assert list_valid_castling(board, "white") == []
 
     def test_white_can_castle_left_cant_castle_right_because_rook_moved_black_cant_castle_because_king_moved(
         self,
@@ -721,15 +721,15 @@ class TestIsCastling:
         board[7][7] = ("rook", "white")
         board[4][0] = ("pawnw", "white")
         board[4][7] = ("pawnw", "white")
-        board = move_piece(board, 7, 1, 6, 1, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 1, 5, 1, "white")
-        board = move_piece(board, 0, 3, 0, 4, "black")
-        board = move_piece(board, 7, 7, 6, 7, "white")
-        board = move_piece(board, 0, 4, 0, 3, "black")
-        board = move_piece(board, 6, 7, 7, 7, "white")
-        assert is_castling(board, "white") == [(7, 1)]
-        assert is_castling(board, "black") == []
+        board = move_piece(board, (7, 1), (6, 1), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 1), (5, 1), "white")
+        board = move_piece(board, (0, 3), (0, 4), "black")
+        board = move_piece(board, (7, 7), (6, 7), "white")
+        board = move_piece(board, (0, 4), (0, 3), "black")
+        board = move_piece(board, (6, 7), (7, 7), "white")
+        assert list_valid_castling(board, "white") == [(7, 1)]
+        assert list_valid_castling(board, "black") == []
 
     def test_both_king_can_castle_in_both_side(self):
         board = empty_board()
@@ -741,5 +741,5 @@ class TestIsCastling:
         board[7][7] = ("rook", "white")
         board[4][0] = ("pawnw", "white")
         board[4][7] = ("pawnw", "white")
-        assert is_castling(board, "white") == [(7, 1), (7, 5)]
-        assert is_castling(board, "black") == [(0, 2), (0, 6)]
+        assert list_valid_castling(board, "white") == [(7, 1), (7, 5)]
+        assert list_valid_castling(board, "black") == [(0, 2), (0, 6)]
