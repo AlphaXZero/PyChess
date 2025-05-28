@@ -135,19 +135,15 @@ def list_valid_move(
     specific_piece: Optional[str] = None,
     ignore_king_safety: bool = False,
     color: str = None,
+    only_control=False,
 ) -> list[Position]:
     y, x = cell
     piece_type = specific_piece or board[y][x][0]
     piece_color = color or board[y][x][1]
     valid_moves = []
-    specific_piece = (
-        "pawnw"
-        if "pawnb" == specific_piece
-        else "pawnb"
-        if specific_piece == "pawnw"
-        else specific_piece
-    )
     if piece_type in ("pawnb", "pawnw"):
+        if only_control:
+            return get_control_pawn(cell, piece_type)
         valid_moves = list_valid_move_pawn(board, cell, piece_type, piece_color)
     else:
         repeat = PIECES[piece_type]["repeat"]
@@ -176,6 +172,17 @@ def list_valid_move(
             castling_positions = list_valid_castling(board, piece_color)
             safe_moves.extend(castling_positions)
         return safe_moves
+
+
+def get_control_pawn(cell, piece_type):
+    move_list = []
+    y, x = cell
+    piece_type = "pawnb" if piece_type == "pawnw" else "pawnw"
+    for i, move in enumerate(PIECES[piece_type]["moves"]):
+        new_y, new_x = y + move[0], x + move[1]
+        if 0 <= new_y <= 7 and 0 <= new_x <= 7 and i != 0:
+            move_list.append((new_y, new_x))
+    return move_list
 
 
 def list_valid_move_pawn(
@@ -222,7 +229,12 @@ def is_check(board: Board, cell: Position, color=None) -> list[Position]:
     piece_color = color or board[y][x][1]
     for i in PIECES.keys():
         for new_y, new_x in list_valid_move(
-            board, cell, i, ignore_king_safety=True, color=piece_color
+            board,
+            cell,
+            i,
+            ignore_king_safety=True,
+            color=piece_color,
+            only_control=True,
         ):
             if board[new_y][new_x][0] == i and piece_color != board[new_y][new_x][1]:
                 checking_cells.append((new_y, new_x))
@@ -367,9 +379,4 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
-    board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
-    board[1][3] = ("pawn", "white")
-    board[7][3] = ("king", "white")
-    board[0][4] = ("king", "black")
-    print_board(board)
-    print(is_check(board, (0, 4), "white"))
+    pass
