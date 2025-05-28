@@ -1,5 +1,6 @@
 import ttkbootstrap as tk
 import engine
+from tkinter import messagebox
 
 COLOR_THEME = {"white": "seashell3", "black": "black"}
 
@@ -11,7 +12,7 @@ text_top = None
 
 
 def build_app() -> tk.Window:
-    global text_top
+    global text_top, root
     root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
     text_top = tk.StringVar()
     build_top_frame(root)
@@ -304,7 +305,7 @@ def show_move(y, x, newy, newx, col):
         if engine.is_check_mat(
             current_board, engine.find_king(current_board, color[((GAME_TURN + 1) % 2)])
         ):
-            print(f"fini {col} a Gagné")
+            messagebox.showinfo("Félicitations !", f"{col} a gagné")
         GAME_TURN += 1
         update_turn_lab()
         print(engine.format_history(engine.HISTORY))

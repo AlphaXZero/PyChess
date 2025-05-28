@@ -300,7 +300,6 @@ def list_valid_castling(board: Board, color: str) -> bool:
                 flag = False
                 break
         for i in range(5):
-            # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
             if is_check(board, (y, 0 + i), color) != []:
                 flag = False
                 break
@@ -318,7 +317,6 @@ def list_valid_castling(board: Board, color: str) -> bool:
                 flag = False
                 break
         for i in range(4):
-            # TODO changer pion prend pas en diagonal si rien donc marche pas dans tes_check
             if is_check(board, (y, 4 + i), color) != []:
                 flag = False
                 break
