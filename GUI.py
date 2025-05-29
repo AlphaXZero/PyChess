@@ -2,7 +2,7 @@ import ttkbootstrap as tk
 import engine
 from tkinter import messagebox
 
-COLOR_CHOICE = "Forest"
+COLOR_CHOICE = "Classic"
 # Themes made by @cindy.vanderveen
 COLOR_THEME = {
     "Classic": {
@@ -66,8 +66,8 @@ COLOR_THEME = {
         "black_board": "#da2c38",
     },
     "Dusk": {
-        "white": {"fill": "#7C4585", "line": "#7C4585"},
-        "black": {"fill": "#F8B55F", "line": "#F8B55F"},
+        "black": {"fill": "#7C4585", "line": "#7C4585"},
+        "white": {"fill": "#F8B55F", "line": "#F8B55F"},
         "white_board": "#C95792",
         "black_board": "#3D365C",
     },
@@ -117,13 +117,32 @@ def build_top_frame(parent):
     global text_top
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="x", expand=False)
-    button = tk.Button(frame, text="Nouvelle Partie", style="sucess", command=restart)
 
     label = tk.Label(frame, text="Game Turn : ", font=("Arial", 14))
     label.pack(side="left", pady=4)
     turn_text = tk.Label(frame, textvariable=text_top, font=("Arial", 14))
     turn_text.pack(side="left", padx=4)
-    button.pack()
+
+    theme_label = tk.Label(frame, text="Theme :", font=("Arial", 14))
+
+    theme_combobox = tk.Combobox(
+        frame,
+        values=list(COLOR_THEME.keys()),
+        width=15,
+        state="readonly",
+    )
+    theme_combobox.pack(side="right", padx=4, pady=4)
+    theme_label.pack(side="right", padx=10)
+    theme_combobox.set(COLOR_CHOICE)
+
+    def change_theme(event):
+        global COLOR_CHOICE
+        COLOR_CHOICE = theme_combobox.get()
+        draw_grid()
+        draw_board()
+
+    theme_combobox.bind("<<ComboboxSelected>>", change_theme)
+
     update_turn_lab()
 
 
@@ -133,11 +152,19 @@ def update_turn_lab():
 
 
 def build_checkerboard(parent):
-    global canvas
+    global canvas, history_content
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
-    frame.pack(side="top", fill="both")
+    frame2 = tk.Frame(parent, borderwidth=2, relief="groove")
+    frame.pack(side="left", fill="both")
+    frame2.pack(side="left", fill="both")
+
+    history_content = tk.StringVar()
+    label = tk.Label(frame2, text="oekzaeizauen", width=20)
+    label["textvariable"] = history_content
+    label.pack()
     canvas = tk.Canvas(frame, width=SIZE * 8, height=SIZE * 8)
-    canvas.pack(fill="both", expand=True, anchor="center", pady=10)
+    canvas.pack(fill="both", expand=True, anchor="center")
+    tk.Text()
     draw_grid()
 
 
@@ -624,7 +651,9 @@ def show_move(y, x, newy, newx, col):
             messagebox.showinfo("Félicitations !", f"{col} a gagné")
         GAME_TURN += 1
         update_turn_lab()
-        print(engine.format_history(engine.HISTORY))
+        history_content.set(
+            history_content.get() + "\n" + engine.format_history(engine.HISTORY)[-1]
+        )
     draw_grid()
     draw_board()
 
