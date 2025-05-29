@@ -2,18 +2,30 @@ import ttkbootstrap as tk
 import engine
 from tkinter import messagebox
 
-COLOR_THEME = {"white": "seashell3", "black": "black"}
+COLOR_THEME = {
+    "white": "white",
+    "black": "gray14",
+    "black_board": "DarkOliveGreen3",
+    "white_board": "Antique white",
+}
 
 current_board = engine.board
 
 color = ["white", "black"]
 GAME_TURN = 0
 text_top = None
+SIZE = 110
+
+
+def gp(percent: int):
+    return SIZE * (percent / 100)
 
 
 def build_app() -> tk.Window:
     global text_top, root
-    root = tk.Window(title="PyChess", themename="pulse", minsize=(600, 600))
+    root = tk.Window(
+        title="PyChess", themename="superhero", minsize=(SIZE * 8, SIZE * 8)
+    )
     text_top = tk.StringVar()
     build_top_frame(root)
     build_checkerboard(root)
@@ -53,23 +65,33 @@ def build_checkerboard(parent):
     global canvas
     frame = tk.Frame(parent, borderwidth=2, relief="groove")
     frame.pack(side="top", fill="both")
-    canvas = tk.Canvas(frame, width=500, height=500)
-    canvas.pack(fill="none", expand=True, anchor="center", pady=10)
+    canvas = tk.Canvas(frame, width=SIZE * 8, height=SIZE * 8)
+    canvas.pack(fill="both", expand=True, anchor="center", pady=10)
     draw_grid()
 
 
 def draw_grid():
     global canvas
-    canvas.configure(width=402, height=402)
+    canvas.configure(width=SIZE * 8, height=SIZE * 8)
     for i in range(8):
         for y in range(8):
             if i % 2 == y % 2:
+                # blanc
                 canvas.create_rectangle(
-                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="lightgoldenrod1"
+                    SIZE * i,
+                    SIZE * y,
+                    SIZE + (SIZE * i),
+                    SIZE + (SIZE * y),
+                    fill=COLOR_THEME["white_board"],
                 )
             else:
+                # noir
                 canvas.create_rectangle(
-                    50 * i, 50 * y, 50 + (50 * i), 50 + (50 * y), fill="darkorange4"
+                    SIZE * i,
+                    SIZE * y,
+                    SIZE + (SIZE * i),
+                    SIZE + (SIZE * y),
+                    fill=COLOR_THEME["black_board"],
                 )
 
 
@@ -94,8 +116,8 @@ def get_clicked_cell1(event):
         :rtype: str
     """
     global current_moove
-    x = event.x // 50
-    y = event.y // 50
+    x = event.x // SIZE
+    y = event.y // SIZE
 
     coords = engine.list_valid_move(current_board, (y, x))
     # remonter la vrif ici
@@ -130,10 +152,10 @@ def draw_warn_circles(cell):
     global canvas
 
     canvas.create_oval(
-        (cell[1] * 50) + 3,
-        (cell[0] * 50) + 3,
-        (cell[1] * 50) + 47,
-        (cell[0] * 50) + 47,
+        (cell[1] * SIZE) + gp(6),
+        (cell[0] * SIZE) + gp(6),
+        (cell[1] * SIZE) + gp(94),
+        (cell[0] * SIZE) + gp(94),
         outline="orange",
         width=4,
     )
@@ -143,10 +165,10 @@ def draw_help_circles(coords):
     global canvas
     for cell in coords:
         canvas.create_oval(
-            (cell[1] * 50) + 20,
-            (cell[0] * 50) + 20,
-            (cell[1] * 50) + 30,
-            (cell[0] * 50) + 30,
+            (cell[1] * SIZE) + gp(40),
+            (cell[0] * SIZE) + gp(40),
+            (cell[1] * SIZE) + gp(60),
+            (cell[0] * SIZE) + gp(60),
             outline="blue",
             width=4,
         )
@@ -154,30 +176,72 @@ def draw_help_circles(coords):
 
 def draw_knight(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # rectangle nez
-    canvas.create_rectangle(x + 10, y + 20, x + 45, y + 30, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(20),
+        y + gp(40),
+        x + gp(90),
+        y + gp(60),
+        outline=color,
+        fill=color,
+    )
     # triangle nez
     canvas.create_polygon(
-        x + 10, y + 20, x + 34, y + 20, x + 35, y + 10, outline=color, fill=color
+        x + gp(20),
+        y + gp(40),
+        x + gp(68),
+        y + gp(40),
+        x + gp(70),
+        y + gp(20),
+        outline=color,
+        fill=color,
     )
     # rectangle corps
-    canvas.create_rectangle(x + 30, y + 10, x + 45, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(60),
+        y + gp(20),
+        x + gp(90),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # base
-    canvas.create_rectangle(x + 20, y + 40, x + 45, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(40),
+        y + gp(80),
+        x + gp(90),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # triangle pied
     canvas.create_polygon(
-        x + 20, y + 40, x + 35, y + 30, x + 35, y + 40, outline=color, fill=color
+        x + gp(40),
+        y + gp(80),
+        x + gp(70),
+        y + gp(60),
+        x + gp(70),
+        y + gp(80),
+        outline=color,
+        fill=color,
     )
     # rectanle oreille
-    canvas.create_rectangle(x + 30, y + 5, x + 40, y + 10, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(60),
+        y + gp(10),
+        x + gp(80),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
     # cercle oeil
     # TODO CHANEGER couleur
     canvas.create_oval(
-        x + 30,
-        y + 15,
-        x + 35,
-        y + 20,
+        x + gp(60),
+        y + gp(30),
+        x + gp(70),
+        y + gp(40),
         outline=color,
         fill="white" if color == "black" else "black",
     )
@@ -185,93 +249,255 @@ def draw_knight(x, y, color):
 
 def draw_rook(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # base
-    canvas.create_rectangle(x + 10, y + 35, x + 40, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(20),
+        y + gp(70),
+        x + gp(80),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # rectanngle corps
-    canvas.create_rectangle(x + 15, y + 20, x + 35, y + 40, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(30),
+        y + gp(40),
+        x + gp(70),
+        y + gp(80),
+        outline=color,
+        fill=color,
+    )
     # rectangle sommet
-    canvas.create_rectangle(x + 12, y + 10, x + 38, y + 20, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(24),
+        y + gp(20),
+        x + gp(76),
+        y + gp(40),
+        outline=color,
+        fill=color,
+    )
     # petit rectangles sommets
-    canvas.create_rectangle(x + 12, y + 5, x + 17, y + 10, outline=color, fill=color)
-    canvas.create_rectangle(x + 22, y + 5, x + 27, y + 10, outline=color, fill=color)
-    canvas.create_rectangle(x + 33, y + 5, x + 38, y + 10, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(24),
+        y + gp(10),
+        x + gp(34),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
+    canvas.create_rectangle(
+        x + gp(44),
+        y + gp(10),
+        x + gp(56),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
+    canvas.create_rectangle(
+        x + gp(66),
+        y + gp(10),
+        x + gp(76),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
+    # base
+    canvas.create_line(x + gp(20), y + gp(70), x + gp(20), y + gp(90), width=2)
+    canvas.create_line(x + gp(20), y + gp(90), x + gp(80), y + gp(90), width=2)
+    canvas.create_line(x + gp(80), y + gp(70), x + gp(80), y + gp(90), width=2)
+    # petites lignes base
+    canvas.create_line(x + gp(20), y + gp(70), x + gp(30), y + gp(70), width=2)
+    canvas.create_line(x + gp(80), y + gp(70), x + gp(70), y + gp(70), width=2)
+    # corps
+    canvas.create_line(x + gp(30), y + gp(70), x + gp(30), y + gp(40), width=2)
+    canvas.create_line(x + gp(70), y + gp(70), x + gp(70), y + gp(40), width=2)
+    # petutes lignes bas ehaut
+    canvas.create_line(x + gp(24), y + gp(40), x + gp(30), y + gp(40), width=2)
+    canvas.create_line(x + gp(76), y + gp(40), x + gp(70), y + gp(40), width=2)
+    # haut cotés
+    canvas.create_line(x + gp(24), y + gp(40), x + gp(24), y + gp(10), width=2)
+    canvas.create_line(x + gp(76), y + gp(40), x + gp(76), y + gp(10), width=2)
+    # petites lignes sommet
+    canvas.create_line(x + gp(24), y + gp(10), x + gp(34), y + gp(10), width=2)
+    canvas.create_line(x + gp(44), y + gp(10), x + gp(56), y + gp(10), width=2)
+    canvas.create_line(x + gp(66), y + gp(10), x + gp(76), y + gp(10), width=2)
+    # petites lignes sommet bas
+    canvas.create_line(x + gp(34), y + gp(20), x + gp(44), y + gp(20), width=2)
+    canvas.create_line(x + gp(66), y + gp(20), x + gp(56), y + gp(20), width=2)
+    # peties lignes verticales
+    canvas.create_line(x + gp(24), y + gp(10), x + gp(24), y + gp(20), width=2)
+    canvas.create_line(x + gp(34), y + gp(10), x + gp(34), y + gp(20), width=2)
+    canvas.create_line(x + gp(44), y + gp(10), x + gp(44), y + gp(20), width=2)
+    canvas.create_line(x + gp(56), y + gp(10), x + gp(56), y + gp(20), width=2)
+    canvas.create_line(x + gp(66), y + gp(10), x + gp(66), y + gp(20), width=2)
 
 
 def draw_pawn(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # base
-    canvas.create_rectangle(x + 10, y + 35, x + 40, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(20),
+        y + gp(70),
+        x + gp(80),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # trapeze corps
     canvas.create_polygon(
-        x + 15,
-        y + 35,
-        x + 20,
-        y + 25,
-        x + 30,
-        y + 25,
-        x + 35,
-        y + 35,
+        x + gp(30),
+        y + gp(70),
+        x + gp(40),
+        y + gp(50),
+        x + gp(60),
+        y + gp(50),
+        x + gp(70),
+        y + gp(70),
         outline=color,
         fill=color,
     )
     # rectangle sommet
-    canvas.create_rectangle(x + 17, y + 15, x + 33, y + 25, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(34),
+        y + gp(30),
+        x + gp(66),
+        y + gp(50),
+        outline=color,
+        fill=color,
+    )
     # rond sommmet
-    canvas.create_oval(x + 20, y + 5, x + 30, y + 15, outline=color, fill=color)
+    canvas.create_oval(
+        x + gp(40),
+        y + gp(10),
+        x + gp(60),
+        y + gp(30),
+        outline=color,
+        fill=color,
+    )
 
 
 def draw_bishop(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # base
-    canvas.create_rectangle(x + 10, y + 35, x + 40, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(20),
+        y + gp(70),
+        x + gp(80),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # ovale corps
-    canvas.create_oval(x + 20, y + 10, x + 30, y + 40, outline=color, fill=color)
+    canvas.create_oval(
+        x + gp(40),
+        y + gp(20),
+        x + gp(60),
+        y + gp(80),
+        outline=color,
+        fill=color,
+    )
     # rond sommmet
-    canvas.create_oval(x + 23, y + 5, x + 27, y + 10, outline=color, fill=color)
+    canvas.create_oval(
+        x + gp(46),
+        y + gp(10),
+        x + gp(54),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
 
 
 def draw_queen(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # base
-    canvas.create_rectangle(x + 5, y + 40, x + 45, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(10),
+        y + gp(80),
+        x + gp(90),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # grand triangle
     canvas.create_polygon(
-        x + 10, y + 40, x + 40, y + 40, x + 25, y + 20, outline=color, fill=color
+        x + gp(20),
+        y + gp(80),
+        x + gp(80),
+        y + gp(80),
+        x + gp(50),
+        y + gp(40),
+        outline=color,
+        fill=color,
     )
     # petit triangle
     canvas.create_polygon(
-        x + 25, y + 22, x + 15, y + 10, x + 35, y + 10, outline=color, fill=color
+        x + gp(50),
+        y + gp(44),
+        x + gp(30),
+        y + gp(20),
+        x + gp(70),
+        y + gp(20),
+        outline=color,
+        fill=color,
     )
     # rond sommet
-    canvas.create_oval(x + 23, y + 5, x + 27, y + 10, outline=color, fill=color)
+    canvas.create_oval(
+        x + gp(46),
+        y + gp(10),
+        x + gp(54),
+        y + gp(20),
+        outline=color,
+        fill=color,
+    )
 
 
 def draw_king(x, y, color):
     global canvas
-    x, y = x * 50, y * 50
+    x, y = x * SIZE, y * SIZE
     # base
-    canvas.create_rectangle(x + 5, y + 40, x + 45, y + 45, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(10),
+        y + gp(80),
+        x + gp(90),
+        y + gp(90),
+        outline=color,
+        fill=color,
+    )
     # traèze
     canvas.create_polygon(
-        x + 10,
-        y + 40,
-        x + 40,
-        y + 40,
-        x + 35,
-        y + 25,
-        x + 15,
-        y + 25,
+        x + gp(20),
+        y + gp(80),
+        x + gp(80),
+        y + gp(80),
+        x + gp(70),
+        y + gp(50),
+        x + gp(30),
+        y + gp(50),
         outline=color,
         fill=color,
     )
     # sommet vertical
-    canvas.create_rectangle(x + 23, y + 25, x + 27, y + 5, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(46),
+        y + gp(50),
+        x + gp(54),
+        y + gp(10),
+        outline=color,
+        fill=color,
+    )
     # sommet horizontal
-    canvas.create_rectangle(x + 14, y + 12, x + 36, y + 14, outline=color, fill=color)
+    canvas.create_rectangle(
+        x + gp(28),
+        y + gp(24),
+        x + gp(72),
+        y + gp(28),
+        outline=color,
+        fill=color,
+    )
 
 
 def draw_board():
