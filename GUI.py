@@ -161,7 +161,7 @@ def build_checkerboard(parent):
     history_content = tk.StringVar()
     label = tk.Label(frame2, text="oekzaeizauen", width=20)
     label["textvariable"] = history_content
-    label.pack()
+    label.pack(padx=3)
     canvas = tk.Canvas(frame, width=SIZE * 8, height=SIZE * 8)
     canvas.pack(fill="both", expand=True, anchor="center")
     tk.Text()
@@ -221,7 +221,11 @@ def get_clicked_cell1(event):
     # remonter la vrif ici
     if current_board[y][x][1] == color[(GAME_TURN % 2)]:
         draw_help_circles(coords)
+
     current_moove.append((y, x))
+    if len(current_moove) == 1 and current_board[y][x] == engine.VOID_CELL:
+        current_moove = []
+
     if len(current_moove) == 2:
         show_move(
             current_moove[0][0],
