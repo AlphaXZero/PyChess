@@ -7,14 +7,16 @@ Type aliases:
 
 __author__ = "georgevdv"
 __version__ = "0.8.0"
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Literal
 from copy import deepcopy
 import colorama as c
 
 Board = list[list[Tuple[str, str]]]
 Position = Tuple[int, int]
 
+# TODO faut il mettre dans un json ?
 VOID_CELL = ("0", "0")
+COLOR = ("white", "black")
 HISTORY: list[dict] = []
 X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
 PIECES = {
@@ -164,6 +166,7 @@ def list_valid_move(
     if piece_type in ("pawnb", "pawnw"):
         if only_control:
             return get_control_pawn(cell, piece_type)
+
         valid_moves = list_valid_move_pawn(board, cell, piece_type, piece_color)
     else:
         repeat = PIECES[piece_type]["repeat"]
@@ -178,8 +181,10 @@ def list_valid_move(
                     break
                 new_y += dy
                 new_x += dx
+
     if ignore_king_safety:
         return valid_moves
+
     safe_moves = []
     for new_y, new_x in valid_moves:
         sim_board = deepcopy(board)
@@ -192,23 +197,47 @@ def list_valid_move(
     return safe_moves
 
 
-def get_control_pawn(cell, piece_type):
+def get_control_pawn(
+    cell: Position, piece_type: Literal["pawnb", "pawnw"]
+) -> list[Position]:
+    """
+    used by list_valid_move, list all the cell controlled by a pawn
+
+    Args:
+        cell (Position): (y,x) valus in the board
+        piece_type (Literal["pawnb", "pawnw")
+
+    Returns:
+        list[Position]: tuple with tuple of cell (y,x) that piece controls
+    """
     move_list = []
     y, x = cell
     piece_type = "pawnb" if piece_type == "pawnw" else "pawnw"
     for i, move in enumerate(PIECES[piece_type]["moves"]):
-        new_y, new_x = y + move[0], x + move[1]
-        if 0 <= new_y <= 7 and 0 <= new_x <= 7 and i != 0:
-            move_list.append((new_y, new_x))
+        if 0 <= y + move[0] <= 7 and 0 <= x + move[1] <= 7 and i != 0:
+            move_list.append((y + move[0], x + move[1]))
     return move_list
 
 
 def list_valid_move_pawn(
-    board: Board, cell, piece_type: str, piece_color: str
+    board: Board, cell: Position, piece_type: str, piece_color: str
 ) -> list[Position]:
+    """
+    used by list_valid_move, same as list_valid_move but for pawn
+
+    Args:
+        board (Board): game board
+        cell (Position): (y,x) values
+        piece_type (str):
+        piece_color (str): "black" | "white"
+
+    Returns:
+        list[Position]: list with tuple of postions (y,x) where the pawn can go
+    """
     y, x = cell
     move_list = []
-    bound = 6 if piece_color == "white" else 1
+    first_moove_bound = 6 if piece_color == "white" else 1
+    en_passant_bound = 3 if piece_color == "white" else 4
     direction = (-1) if piece_color == "white" else 1
 
     for i, move in enumerate(PIECES[piece_type]["moves"]):
@@ -216,15 +245,9 @@ def list_valid_move_pawn(
         if 0 <= new_y <= 7 and 0 <= new_x <= 7:
             if i == 0 and board[new_y][new_x] == VOID_CELL:
                 move_list.append((new_y, new_x))
-                if (
-                    new_y < 7
-                    and bound == y
-                    and board[y + (2 * direction)][x] == VOID_CELL
-                ):
-                    move_list.append((y + (2 * direction), x))
+                if first_moove_bound == y and board[new_y + move[0]][x] == VOID_CELL:
+                    move_list.append((new_y + move[0], x))
             elif i != 0:
-                en_passant_bound = 3 if piece_color == "white" else 4
-
                 if (
                     board[new_y][new_x][1] != piece_color
                     and board[new_y][new_x] != VOID_CELL
@@ -234,14 +257,24 @@ def list_valid_move_pawn(
                     y == en_passant_bound
                     and board[new_y - direction][new_x][0][:-1] == "pawn"
                     and board[new_y - direction][new_x][1] != piece_color
-                    and len(HISTORY) != 0
                     and abs(HISTORY[-1]["cell"][0] - HISTORY[-1]["new_cell"][0]) == 2
                 ):
                     move_list.append((new_y, HISTORY[-1]["new_cell"][1]))
     return move_list
 
 
-def is_check(board: Board, cell: Position, color=None) -> list[Position]:
+def is_check(board: Board, cell: Position, color: str = None) -> list[Position]:
+    """
+    say if the piece at the given Position is in a check state
+
+    Args:
+        board (Board): game board
+        cell (Position): position (y,x) values
+        color (str, optional): mainly used for castling, color of the current player. Defaults to None.
+
+    Returns:
+        list[Position]: list of Positions that are checking the cell given
+    """
     y, x = cell
     checking_cells = []
     piece_color = color or board[y][x][1]
@@ -259,6 +292,16 @@ def is_check(board: Board, cell: Position, color=None) -> list[Position]:
 
 
 def is_check_mat(board: Board, cell: Position) -> bool:
+    """
+    return True if the game is check_mat
+
+    Args:
+        board (Board): game board
+        cell (Position): Position (y,x) values
+
+    Returns:
+        bool: True if check_mat, False otherwise
+    """
     y, x = cell
     piece_color = board[y][x][1]
     if is_check(board, (y, x)) == []:
@@ -274,7 +317,18 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     return True
 
 
+# TODO vérifier si autres pièces peuvent bouger
 def is_stalemate(board: Board, cell: Position) -> bool:
+    """
+    return True if the game is stalemate
+
+    Args:
+        board (Board): game board
+        cell (Position): Position (y,x) values
+
+    Returns:
+        bool: True if stalemate, False otherwise
+    """
     if is_check(board, cell):
         return False
 
@@ -292,26 +346,43 @@ def is_stalemate(board: Board, cell: Position) -> bool:
 
 
 def promote_pawn(board: Board, cell: Position) -> None:
+    """
+    Transforms a pawn in a queen
+
+    Args:
+        board (Board): game board
+        cell (Position): Position (y,x) values of the cell to check
+    """
     y, x = cell
     if board[y][x][0][0:4] == "pawn":
         if y == PIECES[board[y][x][0]]["promote"]:
             board[y][x] = ("queen", board[y][x][1])
 
 
-def list_valid_castling(board: Board, color: str) -> bool:
+def list_valid_castling(board: Board, color: str) -> list[Position]:
+    """
+    returns the position where the king can castle
+
+    Args:
+        board (Board): game board
+        color (str): the color of the player who wants to castle
+
+    Returns:
+        list[Position]: list of tuple (y,x) values where the king can castle
+    """
     poss = []
-    player_turn = 0 if color == "white" else 1
+    player_turn = COLOR.index(color)
     y, x = find_king(board, color)
-    for i, h in enumerate(HISTORY):
-        if h["piece_symbol"] == "king" and i % 2 == player_turn:
+    for i, hist in enumerate(HISTORY):
+        if hist["piece_symbol"] == "king" and i % 2 == player_turn:
             return poss
     # left
     if board[y][0][0] == "rook" and board[y][1:x] == [VOID_CELL] * (x - 1):
         flag = True
-        for i, h in enumerate(HISTORY):
+        for i, hist in enumerate(HISTORY):
             if (
-                h["piece_symbol"] == "rook"
-                and h["cell"] == (y, 0)
+                hist["piece_symbol"] == "rook"
+                and hist["cell"] == (y, 0)
                 and i % 2 == player_turn
             ):
                 flag = False
@@ -325,10 +396,10 @@ def list_valid_castling(board: Board, color: str) -> bool:
     # right
     if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
         flag = True
-        for i, h in enumerate(HISTORY):
+        for i, hist in enumerate(HISTORY):
             if (
-                h["piece_symbol"] == "rook"
-                and h["cell"] == (y, 7)
+                hist["piece_symbol"] == "rook"
+                and hist["cell"] == (y, 7)
                 and i % 2 == player_turn
             ):
                 flag = False

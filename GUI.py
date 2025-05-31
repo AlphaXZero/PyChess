@@ -13,7 +13,7 @@ print(COLOR_THEME)
 LINE_SETTINGS = {"width": 3}
 current_board = engine.board
 
-color = ["white", "black"]
+COLOR = ("white", "black")
 GAME_TURN = 0
 text_top = None
 SIZE = 110
@@ -77,7 +77,7 @@ def build_top_frame(parent):
 
 def update_turn_lab():
     global text_top
-    text_top.set(f"{color[(GAME_TURN % 2)]}")
+    text_top.set(f"{COLOR[(GAME_TURN % 2)]}")
 
 
 def build_checkerboard(parent):
@@ -148,7 +148,7 @@ def get_clicked_cell1(event):
 
     coords = engine.list_valid_move(current_board, (y, x))
     # remonter la vrif ici
-    if current_board[y][x][1] == color[(GAME_TURN % 2)]:
+    if current_board[y][x][1] == COLOR[(GAME_TURN % 2)]:
         draw_help_circles(coords)
 
     current_moove.append((y, x))
@@ -161,7 +161,7 @@ def get_clicked_cell1(event):
             current_moove[0][1],
             current_moove[1][0],
             current_moove[1][1],
-            color[GAME_TURN % 2],
+            COLOR[GAME_TURN % 2],
         )
         current_moove = []
     check_white = engine.is_check(
@@ -579,7 +579,7 @@ def show_move(y, x, newy, newx, col):
     if engine.move_piece(current_board, (y, x), (newy, newx), col) is not None:
         engine.move_piece(current_board, (y, x), (newy, newx), col)
         if engine.is_check_mat(
-            current_board, engine.find_king(current_board, color[((GAME_TURN + 1) % 2)])
+            current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo("Félicitations !", f"{col} a gagné")
         GAME_TURN += 1
