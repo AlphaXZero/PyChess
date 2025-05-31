@@ -1,0 +1,4 @@
+-numéroté case
+-bug rock
+-bug pion
+-bug scroll

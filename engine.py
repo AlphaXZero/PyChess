@@ -63,8 +63,6 @@ PIECES = {
     },
     "0": {"moves": (), "repeat": False},
 }
-
-
 board: Board = [
     [
         ("rook", "black"),
@@ -119,10 +117,20 @@ def print_board(board: Board) -> None:
             else:
                 print(cell[0][0], end=" ")
         print()
-    print("  a b c d e f g h")
+    print(" ", " ".join(X_NAME))
 
 
-def find_king(board: Board, color: str) -> Optional[Position]:
+def find_king(board: Board, color: str) -> Position:
+    """
+    Find the position of the specified color king in the board
+
+    Args:
+        board (Board): game board
+        color (str): color of the king we want to search
+
+    Returns:
+        Position: return a tuple with (y,x) values where the king is
+    """
     for i, line in enumerate(board):
         for j, cell in enumerate(line):
             if cell[0] == "king" and cell[1] == color:
@@ -134,12 +142,24 @@ def list_valid_move(
     cell: Position,
     specific_piece: Optional[str] = None,
     ignore_king_safety: bool = False,
-    color: str = None,
-    only_control=False,
+    only_control: bool = False,
 ) -> list[Position]:
+    """
+    List all the position where the piece at the given position can go
+
+    Args:
+        board (Board): game board
+        cell (Position): position (y,x) of the piece
+        specific_piece (Optional[str], optional): used for is_check, simulate another piece type than the one at the given positon. Defaults to None.
+        ignore_king_safety (bool, optional): if True, dont look if the king is check after move. Defaults prevent the player to check himself. Defaults to False.
+        only_control (bool, optional): used for is_check, only look after the control zone of the pawn. Defaults to False.
+
+    Returns:
+        list[Position]: list of tuple (y,x) with every positons where the piece can go
+    """
     y, x = cell
     piece_type = specific_piece or board[y][x][0]
-    piece_color = color or board[y][x][1]
+    piece_color = board[y][x][1]
     valid_moves = []
     if piece_type in ("pawnb", "pawnw"):
         if only_control:
@@ -160,18 +180,16 @@ def list_valid_move(
                 new_x += dx
     if ignore_king_safety:
         return valid_moves
-    else:
-        safe_moves = []
-        for new_y, new_x in valid_moves:
-            sim_board = deepcopy(board)
-            sim_board[new_y][new_x], sim_board[y][x] = sim_board[y][x], VOID_CELL
-            king_cell = find_king(sim_board, piece_color)
-            if king_cell and not is_check(sim_board, king_cell):
-                safe_moves.append((new_y, new_x))
-        if piece_type == "king":
-            castling_positions = list_valid_castling(board, piece_color)
-            safe_moves.extend(castling_positions)
-        return safe_moves
+    safe_moves = []
+    for new_y, new_x in valid_moves:
+        sim_board = deepcopy(board)
+        sim_board[new_y][new_x], sim_board[y][x] = sim_board[y][x], VOID_CELL
+        king_cell = find_king(sim_board, piece_color)
+        if king_cell and not is_check(sim_board, king_cell):
+            safe_moves.append((new_y, new_x))
+    if piece_type == "king":
+        safe_moves.extend(list_valid_castling(board, piece_color))
+    return safe_moves
 
 
 def get_control_pawn(cell, piece_type):
@@ -233,7 +251,6 @@ def is_check(board: Board, cell: Position, color=None) -> list[Position]:
             cell,
             i,
             ignore_king_safety=True,
-            color=piece_color,
             only_control=True,
         ):
             if board[new_y][new_x][0] == i and piece_color != board[new_y][new_x][1]:
@@ -377,4 +394,4 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
-    pass
+    print_board(board)
