@@ -283,7 +283,8 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     """
     y, x = cell
     piece_color = board[y][x][1]
-    if is_check(board, (y, x)) == []:
+    attacking_positions = is_check(board, (y, x))
+    if attacking_positions == []:
         return False
     for move in PIECES[board[y][x][0]]["moves"]:
         new_y, new_x = y + move[0], x + move[1]
@@ -295,6 +296,11 @@ def is_check_mat(board: Board, cell: Position) -> bool:
             continue
         if is_check(board_test, (new_y, new_x)) == []:
             return False
+    for i, line in enumerate(board):
+        for j, piece in enumerate(line):
+            if piece[1] == board[y][x][1]:
+                if bool(set(attacking_positions) & set(list_valid_move(board, (i, j)))):
+                    return False
     return True
 
 

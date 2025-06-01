@@ -38,11 +38,12 @@ def build_app() -> tk.Window:
 
 
 def reset_var():
-    global GAME_TURN, history_content
+    global GAME_TURN, history_content, past_board
     engine.HISTORY = []
     GAME_TURN = 0
     history_content.set("")
     engine.occu_board = 0
+    past_board = []
 
 
 def restart():
