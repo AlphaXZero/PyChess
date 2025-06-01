@@ -396,8 +396,21 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
 
 
 def move_piece(
-    board: Board, cell, new_cell, color: str, no_mem: bool = False
+    board: Board, cell: Position, new_cell: Position, color: str, no_mem: bool = False
 ) -> Board | None:
+    """
+    take a game board, a cell and a new_cell to move and returns the board with the piece moved
+
+    Args:
+        board (Board): game_board
+        cell (Position): initial position (y,x)
+        new_cell (Position): position where to move
+        color (str): color of the player's turn
+        no_mem (bool, optional): used to avoid is_check_mate adding things in the HISTORY. Defaults to False.
+
+    Returns:
+        Board | None: return the board with the movement done or None if the position is unreachable
+    """
     y, x = cell
     new_y, new_x = new_cell
     piece_type = board[y][x][0]
@@ -409,7 +422,7 @@ def move_piece(
             update_history(HISTORY, piece_type, (y, x), (new_y, new_x))
         # en_passant
         if (
-            len(HISTORY) >= 2
+            len(HISTORY) > 2
             and HISTORY[-1]["piece_symbol"][0] == "p"
             and HISTORY[-2]["piece_symbol"][0] == "p"
             and HISTORY[-2]["cell"][1] != HISTORY[-1]["cell"][1]
@@ -417,14 +430,14 @@ def move_piece(
         ):
             direction = 1 if color == "white" else -1
             board[new_y + direction][new_x] = VOID_CELL
-
+        # castle
         if piece_type == "king" and abs(new_x - x) == 2:
             if new_x == 2:
                 board[y][0], board[y][3] = board[y][3], board[y][0]
             else:
                 board[y][7], board[y][5] = board[y][5], board[y][7]
-        board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
 
+        board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
         promote_pawn(board, (new_y, new_x))
 
     else:
@@ -433,8 +446,20 @@ def move_piece(
 
 
 def update_history(
-    history: list[dict], piece, cell: Position, new_cell: Position
+    history: list[dict], piece: str, cell: Position, new_cell: Position
 ) -> list[dict]:
+    """
+    add move in the history
+
+    Args:
+        history (list[dict]): old moves
+        piece (str): king, rook, ...
+        cell (Position): position (y,x) pre move
+        new_cell (Position): posiiton (y,x) post move
+
+    Returns:
+        list[dict]: list with moves
+    """
     y, x = cell
     new_y, new_x = new_cell
     history.append({"piece_symbol": piece, "cell": (y, x), "new_cell": (new_y, new_x)})
@@ -442,6 +467,15 @@ def update_history(
 
 
 def format_history(history: list[dict[str]]) -> list[str]:
+    """
+    format the history to be redeable
+
+    Args:
+        history (list[dict[str]]): list of moves to format
+
+    Returns:
+        list[str]: list of moves formated
+    """
     text_history = []
     for item in history:
         text_history.append(
