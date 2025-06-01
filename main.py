@@ -1,11 +1,15 @@
-import colorama as c
-import engine
+import json
 import GUI
 
 
-def move_knight():
-    GUI.show_move(0, 1, 2, 2)
+def save_game_on_quit():
+    GUI.build_app().mainloop()
+    with open("board.json", "r") as f:
+        boards = json.load(f)
+    boards["current"] = GUI.current_board
+    with open("board.json", "w") as f:
+        json.dump(boards, f)
 
 
 if __name__ == "__main__":
-    GUI.build_app(move_knight).mainloop()
+    save_game_on_quit()

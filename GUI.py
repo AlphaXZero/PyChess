@@ -5,9 +5,10 @@ from tkinter import messagebox
 
 COLOR_CHOICE = "Classic"
 # Themes made by @cindy.vanderveen
-f = open("themes.txt", "r").read()
-COLOR_THEME = json.loads(f)
-print(COLOR_THEME)
+f = open("themes.json", "r").read()
+content = json.loads(f)
+COLOR_CHOICE = content["user choice"]
+COLOR_THEME = content["color theme"]
 
 
 LINE_SETTINGS = {"width": 3}
@@ -35,11 +36,29 @@ def build_app() -> tk.Window:
     return root
 
 
+def reset_var():
+    global GAME_TURN, history_content
+    engine.HISTORY = []
+    GAME_TURN = 0
+    history_content = tk.StringVar()
+
+
 def restart():
     global current_board
-    current_board = engine.board
-    draw_grid()
-    draw_board()
+    oui = messagebox.askyesno(
+        title="Recommencer ?",
+        message="Etes vous sûr de vouloir recommencer la partie ?",
+    )
+    if oui:
+        with open("board.json", "r") as f:
+            boards = json.load(f)
+        boards["current"] = []
+        with open("board.json", "w") as f:
+            json.dump(boards, f)
+        current_board = boards["default"]
+        reset_var()
+        draw_grid()
+        draw_board()
 
 
 def build_top_frame(parent):
@@ -51,6 +70,9 @@ def build_top_frame(parent):
     label.pack(side="left", pady=4)
     turn_text = tk.Label(frame, textvariable=text_top, font=("Arial", 14))
     turn_text.pack(side="left", padx=4)
+
+    button = tk.Button(frame, command=restart, text="Recommencer la partie")
+    button.pack(side="left", padx=30)
 
     theme_label = tk.Label(frame, text="Theme :", font=("Arial", 14))
 
@@ -66,7 +88,12 @@ def build_top_frame(parent):
 
     def change_theme(event):
         global COLOR_CHOICE
+
         COLOR_CHOICE = theme_combobox.get()
+        content["user choice"] = COLOR_CHOICE
+        f = open("themes.json", "w")
+        f.write(json.dumps(content))
+        f.close()
         draw_grid()
         draw_board()
 
@@ -582,6 +609,10 @@ def show_move(y, x, newy, newx, col):
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo("Félicitations !", f"{col} a gagné")
+            with open("board.json", "r+") as f:
+                boards = json.load(f.read())
+                boards["current"] = []
+                f.write(json.dumps(boards))
         GAME_TURN += 1
         update_turn_lab()
         history_content.set(
@@ -592,4 +623,4 @@ def show_move(y, x, newy, newx, col):
 
 
 if __name__ == "__main__":
-    build_app().mainloop()
+    pass

@@ -10,15 +10,18 @@ __version__ = "0.8.0"
 from typing import Optional, Tuple, Literal
 from copy import deepcopy
 import colorama as c
+import json
 
 Board = list[list[Tuple[str, str]]]
 Position = Tuple[int, int]
 
-# TODO faut il mettre dans un json ?
-VOID_CELL = ("0", "0")
+VOID_CELL = ["0", "0"]
 COLOR = ("white", "black")
 HISTORY: list[dict] = []
 X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
+with open("board.json", "r") as f:
+    content = json.load(f)
+board: Board = content["default"] if content["current"] == [] else content["current"]
 PIECES = {
     "knight": {
         "moves": (
@@ -65,34 +68,6 @@ PIECES = {
     },
     "0": {"moves": (), "repeat": False},
 }
-board: Board = [
-    [
-        ("rook", "black"),
-        ("knight", "black"),
-        ("bishop", "black"),
-        ("queen", "black"),
-        ("king", "black"),
-        ("bishop", "black"),
-        ("knight", "black"),
-        ("rook", "black"),
-    ],
-    [("pawnb", "black") for _ in range(8)],
-    [VOID_CELL for _ in range(8)],
-    [VOID_CELL for _ in range(8)],
-    [VOID_CELL for _ in range(8)],
-    [VOID_CELL for _ in range(8)],
-    [("pawnw", "white") for _ in range(8)],
-    [
-        ("rook", "white"),
-        ("knight", "white"),
-        ("bishop", "white"),
-        ("queen", "white"),
-        ("king", "white"),
-        ("bishop", "white"),
-        ("knight", "white"),
-        ("rook", "white"),
-    ],
-]
 
 
 def print_board(board: Board) -> None:
@@ -374,10 +349,11 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
     player_turn = COLOR.index(color)
     y, x = find_king(board, color)
     for i, hist in enumerate(HISTORY):
-        if hist["piece_symbol"] == "king" and i % 2 == player_turn:
+        if hist["piece_symbol"] == "king" and (i % 2) == player_turn:
             return poss
     # left
     if board[y][0][0] == "rook" and board[y][1:x] == [VOID_CELL] * (x - 1):
+        print("gauche")
         flag = True
         for i, hist in enumerate(HISTORY):
             if (
@@ -385,16 +361,19 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
                 and hist["cell"] == (y, 0)
                 and i % 2 == player_turn
             ):
+                print("tour à bougé")
                 flag = False
                 break
         for i in range(5):
             if is_check(board, (y, 0 + i), color) != []:
+                print("piece echec", is_check(board, (y, 0 + i), color))
                 flag = False
                 break
         if flag:
             poss.append((y, len(board[y][1:x]) - 1))
     # right
     if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
+        print("droite")
         flag = True
         for i, hist in enumerate(HISTORY):
             if (
@@ -402,10 +381,12 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
                 and hist["cell"] == (y, 7)
                 and i % 2 == player_turn
             ):
+                print("Tour à bougé")
                 flag = False
                 break
         for i in range(4):
             if is_check(board, (y, 4 + i), color) != []:
+                print("piece echec", is_check(board, (y, 4 + i), color))
                 flag = False
                 break
         if flag:
