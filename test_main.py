@@ -887,6 +887,14 @@ class TestIsStalemate:
         board[2][5] = ("knight", "black")
         assert not is_stalemate(board, (4, 4))
 
+    def test_stalemate_position_but_can_move_another_piece_so_not_stalemate(self):
+        board = empty_board()
+        board[0][0] = ("king", "white")
+        board[2][1] = ("queen", "black")
+        board[1][2] = ("king", "black")
+        board[6][6] = ("pawnw", "white")
+        assert not is_stalemate(board, (0, 0))
+
     def test_stalemate_position(self):
         board = empty_board()
         board[0][0] = ("king", "white")

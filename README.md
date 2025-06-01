@@ -1,4 +1,5 @@
 -numéroté case
--bug rock
--bug pion
+-Verifier draw 50 coups sans prise
+-verifier draw 3 coups les mêmes
+-bouton se rendre
 -bug scroll

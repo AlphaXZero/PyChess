@@ -13,7 +13,7 @@ import colorama as c
 import json
 
 
-Board = list[list[Tuple[str, str]]]
+Board = list[list[list[str, str]]]
 Position = Tuple[int, int]
 
 VOID_CELL = ["0", "0"]
@@ -23,6 +23,8 @@ X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
 with open("board.json", "r") as f:
     content = json.load(f)
 board: Board = content["default"] if content["current"] == [] else content["current"]
+
+occu_board = 0
 HISTORY: list[dict] = [] if content["history"] == [] else content["history"]
 PIECES = {
     "knight": {
@@ -296,7 +298,6 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     return True
 
 
-# TODO vérifier si autres pièces peuvent bouger
 def is_stalemate(board: Board, cell: Position) -> bool:
     """
     return True if the game is stalemate
@@ -308,21 +309,47 @@ def is_stalemate(board: Board, cell: Position) -> bool:
     Returns:
         bool: True if stalemate, False otherwise
     """
+    y, x = cell
     if is_check(board, cell):
         return False
-
     for move in list_valid_move(board, cell, ignore_king_safety=True):
         sim_board = deepcopy(board)
         sim_board = move_piece(
             sim_board,
-            (cell[0], cell[1]),
+            (y, x),
             (move[0], move[1]),
-            board[cell[0]][cell[1]][1],
+            board[y][x][1],
             no_mem=True,
         )
         if not is_check(board, (move[0], move[1])):
             return False
+    for i, line in enumerate(board):
+        for j, piece in enumerate(line):
+            if piece[1] == board[y][x][1]:
+                print(piece)
+                if list_valid_move(board, (i, j)) != []:
+                    return False
+
     return True
+
+
+def is_draw_repetitions(board: Board, past_board: list[Board]) -> bool:
+    """
+    check if the same positions appears 3 times
+
+    Args:
+        board (_type_): game board
+        past_board (_type_): list of past games board
+
+    Returns:
+        _type_: True id is a draw, False otherwise
+    """
+    global occu_board
+    if board in past_board:
+        occu_board += 1
+    if occu_board == 3:
+        return True
+    return False
 
 
 def promote_pawn(board: Board, cell: Position) -> None:
@@ -485,4 +512,10 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
-    pass
+    board = [[VOID_CELL for _ in range(8)] for _ in range(8)]
+    board[0][0] = ("king", "white")
+    board[2][1] = ("queen", "black")
+    board[1][2] = ("king", "black")
+    board[6][6] = ("pawnw", "white")
+    print_board(board)
+    print(is_stalemate(board, (0, 0)))

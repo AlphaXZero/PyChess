@@ -1,6 +1,7 @@
 import ttkbootstrap as tk
 import engine
 import json
+from copy import deepcopy
 from tkinter import messagebox
 
 COLOR_CHOICE = "Classic"
@@ -13,7 +14,7 @@ COLOR_THEME = content["color theme"]
 
 LINE_SETTINGS = {"width": 3}
 current_board = engine.board
-
+past_board = [deepcopy(current_board)]
 COLOR = ("white", "black")
 GAME_TURN = len(engine.HISTORY)
 text_top = None
@@ -41,6 +42,7 @@ def reset_var():
     engine.HISTORY = []
     GAME_TURN = 0
     history_content.set("")
+    engine.occu_board = 0
 
 
 def restart():
@@ -602,10 +604,13 @@ def draw_piece(piece, x, y):
 
 
 def show_move(y, x, newy, newx, col):
-    global GAME_TURN
-
+    global GAME_TURN, past_board
     if engine.move_piece(current_board, (y, x), (newy, newx), col) is not None:
         engine.move_piece(current_board, (y, x), (newy, newx), col)
+        if engine.is_draw_repetitions(current_board, past_board):
+            messagebox.showinfo(title="oui", message="égalité par répétitions")
+        else:
+            past_board.append(deepcopy(current_board))
         if engine.is_check_mat(
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
