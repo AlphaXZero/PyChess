@@ -12,16 +12,18 @@ from copy import deepcopy
 import colorama as c
 import json
 
+
 Board = list[list[Tuple[str, str]]]
 Position = Tuple[int, int]
 
 VOID_CELL = ["0", "0"]
 COLOR = ("white", "black")
-HISTORY: list[dict] = []
+
 X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
 with open("board.json", "r") as f:
     content = json.load(f)
 board: Board = content["default"] if content["current"] == [] else content["current"]
+HISTORY: list[dict] = [] if content["history"] == [] else content["history"]
 PIECES = {
     "knight": {
         "moves": (
@@ -284,7 +286,9 @@ def is_check_mat(board: Board, cell: Position) -> bool:
     for move in PIECES[board[y][x][0]]["moves"]:
         new_y, new_x = y + move[0], x + move[1]
         board_test = deepcopy(board)
-        board_test = move_piece(board_test, (y, x), (new_y, new_x), piece_color)
+        board_test = move_piece(
+            board_test, (y, x), (new_y, new_x), piece_color, no_mem=True
+        )
         if board_test is None:
             continue
         if is_check(board_test, (new_y, new_x)) == []:
@@ -314,6 +318,7 @@ def is_stalemate(board: Board, cell: Position) -> bool:
             (cell[0], cell[1]),
             (move[0], move[1]),
             board[cell[0]][cell[1]][1],
+            no_mem=True,
         )
         if not is_check(board, (move[0], move[1])):
             return False
@@ -351,9 +356,9 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
     for i, hist in enumerate(HISTORY):
         if hist["piece_symbol"] == "king" and (i % 2) == player_turn:
             return poss
+
     # left
     if board[y][0][0] == "rook" and board[y][1:x] == [VOID_CELL] * (x - 1):
-        print("gauche")
         flag = True
         for i, hist in enumerate(HISTORY):
             if (
@@ -361,19 +366,16 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
                 and hist["cell"] == (y, 0)
                 and i % 2 == player_turn
             ):
-                print("tour à bougé")
                 flag = False
                 break
         for i in range(5):
             if is_check(board, (y, 0 + i), color) != []:
-                print("piece echec", is_check(board, (y, 0 + i), color))
                 flag = False
                 break
         if flag:
             poss.append((y, len(board[y][1:x]) - 1))
     # right
     if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
-        print("droite")
         flag = True
         for i, hist in enumerate(HISTORY):
             if (
@@ -381,12 +383,10 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
                 and hist["cell"] == (y, 7)
                 and i % 2 == player_turn
             ):
-                print("Tour à bougé")
                 flag = False
                 break
         for i in range(4):
             if is_check(board, (y, 4 + i), color) != []:
-                print("piece echec", is_check(board, (y, 4 + i), color))
                 flag = False
                 break
         if flag:
@@ -395,14 +395,19 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
     return poss
 
 
-def move_piece(board: Board, cell, new_cell, color: str) -> Board | None:
+def move_piece(
+    board: Board, cell, new_cell, color: str, no_mem: bool = False
+) -> Board | None:
     y, x = cell
     new_y, new_x = new_cell
+    piece_type = board[y][x][0]
     if board[y][x][1] != color:
         return None
     possible_moves = list_valid_move(board, (y, x))
     if (new_y, new_x) in possible_moves:
-        update_history(HISTORY, board, (y, x), (new_y, new_x))
+        if not no_mem:
+            update_history(HISTORY, piece_type, (y, x), (new_y, new_x))
+        # en_passant
         if (
             len(HISTORY) >= 2
             and HISTORY[-1]["piece_symbol"][0] == "p"
@@ -413,12 +418,13 @@ def move_piece(board: Board, cell, new_cell, color: str) -> Board | None:
             direction = 1 if color == "white" else -1
             board[new_y + direction][new_x] = VOID_CELL
 
-        if board[y][x][0] == "king" and abs(new_x - x) == 2:
+        if piece_type == "king" and abs(new_x - x) == 2:
             if new_x == 2:
                 board[y][0], board[y][3] = board[y][3], board[y][0]
             else:
                 board[y][7], board[y][5] = board[y][5], board[y][7]
         board[new_y][new_x], board[y][x] = board[y][x], VOID_CELL
+
         promote_pawn(board, (new_y, new_x))
 
     else:
@@ -427,11 +433,10 @@ def move_piece(board: Board, cell, new_cell, color: str) -> Board | None:
 
 
 def update_history(
-    history: list[dict], board: Board, cell: Position, new_cell: Position
+    history: list[dict], piece, cell: Position, new_cell: Position
 ) -> list[dict]:
     y, x = cell
     new_y, new_x = new_cell
-    piece = board[cell[0]][cell[1]][0]
     history.append({"piece_symbol": piece, "cell": (y, x), "new_cell": (new_y, new_x)})
     return history
 
@@ -446,4 +451,4 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
-    print_board(board)
+    pass

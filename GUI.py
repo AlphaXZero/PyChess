@@ -15,7 +15,7 @@ LINE_SETTINGS = {"width": 3}
 current_board = engine.board
 
 COLOR = ("white", "black")
-GAME_TURN = 0
+GAME_TURN = len(engine.HISTORY)
 text_top = None
 SIZE = 110
 
@@ -40,7 +40,7 @@ def reset_var():
     global GAME_TURN, history_content
     engine.HISTORY = []
     GAME_TURN = 0
-    history_content = tk.StringVar()
+    history_content.set("")
 
 
 def restart():
@@ -115,8 +115,10 @@ def build_checkerboard(parent):
     frame2.pack(side="left", fill="both")
 
     history_content = tk.StringVar()
-    label = tk.Label(frame2, text="oekzaeizauen", width=20)
-    label["textvariable"] = history_content
+    history_content.set("\n".join(engine.format_history(engine.HISTORY)))
+    label = tk.Label(
+        frame2, text="oekzaeizauen", width=20, textvariable=history_content
+    )
     label.pack(padx=3)
     canvas = tk.Canvas(frame, width=SIZE * 8, height=SIZE * 8)
     canvas.pack(fill="both", expand=True, anchor="center")
@@ -201,7 +203,6 @@ def get_clicked_cell1(event):
     check_black = engine.is_check(
         current_board, engine.find_king(current_board, "black")
     )
-    # TODO:séparer + pion bug pour roi blanc
     for i in check_black:
         draw_warn_circles(i)
 
@@ -608,11 +609,13 @@ def show_move(y, x, newy, newx, col):
         if engine.is_check_mat(
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
-            messagebox.showinfo("Félicitations !", f"{col} a gagné")
-            with open("board.json", "r+") as f:
-                boards = json.load(f.read())
-                boards["current"] = []
-                f.write(json.dumps(boards))
+            messagebox.showinfo(f"Félicitations ! {col} a gagné")
+            with open("board.json", "r") as f:
+                boards = json.load(f)
+            boards["current"] = []
+            with open("board.json", "w") as f:
+                json.dump(boards, f, indent=4)
+
         GAME_TURN += 1
         update_turn_lab()
         history_content.set(
