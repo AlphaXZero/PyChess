@@ -16,7 +16,7 @@ LINE_SETTINGS = {"width": 3}
 current_board = engine.board
 past_board = [deepcopy(current_board)]
 COLOR = ("white", "black")
-GAME_TURN = len(engine.HISTORY)
+GAME_TURN = len(engine.history)
 text_top = None
 SIZE = 110
 
@@ -39,7 +39,7 @@ def build_app() -> tk.Window:
 
 def reset_var():
     global GAME_TURN, history_content, past_board
-    engine.HISTORY = []
+    engine.history = []
     GAME_TURN = 0
     history_content.set("")
     engine.occu_board = 0
@@ -118,7 +118,7 @@ def build_checkerboard(parent):
     frame2.pack(side="left", fill="both")
 
     history_content = tk.StringVar()
-    history_content.set("\n".join(engine.format_history(engine.HISTORY)))
+    history_content.set("\n".join(engine.format_history(engine.history)))
     label = tk.Label(
         frame2, text="oekzaeizauen", width=20, textvariable=history_content
     )
@@ -196,14 +196,14 @@ def get_clicked_cell1(event):
             COLOR[GAME_TURN % 2],
         )
         current_moove = []
-    check_white = engine.is_check(
+    check_white = engine.get_checking_pieces(
         current_board, engine.find_king(current_board, "white")
     )
     # TODO:séparer
     for i in check_white:
         draw_warn_circles(i)
 
-    check_black = engine.is_check(
+    check_black = engine.get_checking_pieces(
         current_board, engine.find_king(current_board, "black")
     )
     for i in check_black:
@@ -612,7 +612,7 @@ def show_move(y, x, newy, newx, col):
             messagebox.showinfo(title="oui", message="égalité par répétitions")
         else:
             past_board.append(deepcopy(current_board))
-        if engine.is_check_mat(
+        if engine.is_checkmat(
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo(f"Félicitations ! {col} a gagné")
@@ -625,7 +625,7 @@ def show_move(y, x, newy, newx, col):
         GAME_TURN += 1
         update_turn_lab()
         history_content.set(
-            history_content.get() + "\n" + engine.format_history(engine.HISTORY)[-1]
+            history_content.get() + "\n" + engine.format_history(engine.history)[-1]
         )
     draw_grid()
     draw_board()

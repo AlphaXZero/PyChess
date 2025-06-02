@@ -3,10 +3,10 @@ from engine import (
     list_valid_move,
     VOID_CELL,
     Board,
-    HISTORY,
+    history,
     move_piece,
-    is_check,
-    is_check_mat,
+    get_checking_pieces,
+    is_checkmat,
     is_stalemate,
     list_valid_castling,
 )
@@ -14,7 +14,7 @@ from engine import (
 
 @pytest.fixture(autouse=True)
 def reset_history():
-    HISTORY.clear()
+    history.clear()
 
 
 def empty_board() -> Board:
@@ -805,14 +805,14 @@ class TestIsCheck:
     def test_king_not_in_check(self):
         board = empty_board()
         board[7][4] = ("king", "white")
-        result = is_check(board, (7, 4))
+        result = get_checking_pieces(board, (7, 4))
         assert result == []
 
     def test_king_in_check_by_rook(self):
         board = empty_board()
         board[7][4] = ("king", "white")
         board[5][4] = ("rook", "black")
-        result = is_check(board, (7, 4))
+        result = get_checking_pieces(board, (7, 4))
         assert (5, 4) in result
         assert len(result) == 1
 
@@ -821,7 +821,7 @@ class TestIsCheck:
         board[7][4] = ("king", "white")
         board[5][4] = ("rook", "black")
         board[6][3] = ("bishop", "black")
-        result = is_check(board, (7, 4))
+        result = get_checking_pieces(board, (7, 4))
         assert (5, 4) in result
         assert (6, 3) in result
         assert len(result) == 2
@@ -830,7 +830,7 @@ class TestIsCheck:
         board = empty_board()
         board[4][4] = ("king", "white")
         board[2][5] = ("knight", "black")
-        result = is_check(board, (4, 4))
+        result = get_checking_pieces(board, (4, 4))
         assert (2, 5) in result
         assert len(result) == 1
 
@@ -848,7 +848,7 @@ class TestIsCheckMat:
         board[2][0] = ("pawnb", "black")
         board[2][1] = ("pawnb", "black")
         board[2][2] = ("pawnb", "black")
-        assert not is_check_mat(board, (1, 1))
+        assert not is_checkmat(board, (1, 1))
 
     def test_pawn_can_block_check_mate(self):
         board = empty_board()
@@ -857,7 +857,7 @@ class TestIsCheckMat:
         board[5][0] = ("rook", "black")
         board[4][0] = ("rook", "black")
         board[5][1] = ("pawnw", "white")
-        assert not is_check_mat(board, (4, 4))
+        assert not is_checkmat(board, (4, 4))
 
     def test_king_in_double_rook_checkmate(self):
         board = empty_board()
@@ -865,13 +865,13 @@ class TestIsCheckMat:
         board[0][0] = ("king", "black")
         board[6][5] = ("rook", "black")
         board[7][1] = ("rook", "black")
-        assert is_check_mat(board, (7, 7))
+        assert is_checkmat(board, (7, 7))
 
     def test_king_can_escape(self):
         board = empty_board()
         board[4][4] = ("king", "white")
         board[2][5] = ("knight", "black")
-        assert not is_check_mat(board, (4, 4))
+        assert not is_checkmat(board, (4, 4))
 
 
 class TestIsStalemate:
