@@ -48,6 +48,7 @@ def reset_var():
     global GAME_TURN, past_board
     engine.history = []
     GAME_TURN = 0
+    label_spec.config(state="normal")
     label_spec.delete("1.0", tk.END)
     engine.occu_board = 0
     past_board = []
@@ -72,7 +73,12 @@ def restart_game():
 
 def build_top_frame(parent):
     global text_top
-    frame = tk.Frame(parent, borderwidth=2, relief="groove")
+
+    frame = tk.Frame(
+        parent,
+        borderwidth=2,
+        relief="groove",
+    )
     frame.pack(side="top", fill="x", expand=True)
 
     label = tk.Label(frame, text="Game Turn : ", font=("Times New Roman", 14))
@@ -210,17 +216,15 @@ def get_clicked_cell1(event):
     x = event.x // SIZE
     y = event.y // SIZE
     coords = engine.list_valid_move(current_board, (y, x))
-    if current_board[y][x][1] == COLOR[(GAME_TURN % 2)]:
+    if current_board[y][x][1] == COLOR[(GAME_TURN % 2)] and len(current_moove) == 0:
         draw_help_circles(coords, canvas)
-
-    current_moove.append((y, x))
-    if len(current_moove) == 1 and current_board[y][x] == engine.VOID_CELL:
-        current_moove = []
-    if len(current_moove) == 1 and current_board[y][x][1] == COLOR[(GAME_TURN % 2)]:
-        current_moove = [(y, x)]
+        current_moove.append((y, x))
+    elif len(current_moove) == 1 and current_board[y][x][1] == COLOR[(GAME_TURN % 2)]:
         draw_board()
         draw_help_circles(coords, canvas)
-
+        current_moove = [(y, x)]
+    else:
+        current_moove.append((y, x))
     if len(current_moove) == 2:
         show_move(
             current_moove[0][0],
