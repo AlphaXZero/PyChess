@@ -6,11 +6,11 @@ Type aliases:
 """
 
 __author__ = "georgevdv"
-__version__ = "0.8.0"
-from typing import Optional, Tuple, Literal
+__version__ = "1.0.0"
+import json
 from copy import deepcopy
 import colorama as c
-import json
+from typing import Optional, Tuple, Literal
 
 
 Board = list[list[list[str, str]]]
@@ -18,8 +18,8 @@ Position = Tuple[int, int]
 
 VOID_CELL = ["0", "0"]
 COLOR = ("white", "black")
-
 X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
+
 with open("board.json", "r") as f:
     game_state = json.load(f)
 board: Board = (
@@ -454,6 +454,8 @@ def move_piece(
             and history[-2]["piece_type"][0] == "p"
             and history[-2]["cell"][1] != history[-1]["cell"][1]
             and history[-2]["new_cell"][1] == history[-1]["new_cell"][1]
+            and history[-1]["cell"][0] in (3, 4)
+            and history[-1]["new_cell"][0] in (2, 5)
         ):
             direction = 1 if color == "white" else -1
             board[new_y + direction][new_x] = VOID_CELL

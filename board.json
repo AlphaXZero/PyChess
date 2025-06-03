@@ -288,8 +288,8 @@
                 "black"
             ],
             [
-                "queen",
-                "black"
+                "0",
+                "0"
             ],
             [
                 "king",
@@ -300,8 +300,8 @@
                 "black"
             ],
             [
-                "knight",
-                "black"
+                "0",
+                "0"
             ],
             [
                 "rook",
@@ -322,40 +322,6 @@
                 "black"
             ],
             [
-                "pawnb",
-                "black"
-            ],
-            [
-                "pawnb",
-                "black"
-            ],
-            [
-                "pawnb",
-                "black"
-            ],
-            [
-                "pawnb",
-                "black"
-            ],
-            [
-                "pawnb",
-                "black"
-            ]
-        ],
-        [
-            [
-                "0",
-                "0"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
                 "0",
                 "0"
             ],
@@ -424,9 +390,27 @@
                 "0"
             ],
             [
+                "pawnb",
+                "black"
+            ],
+            [
+                "pawnb",
+                "black"
+            ],
+            [
                 "0",
                 "0"
             ],
+            [
+                "pawnb",
+                "black"
+            ],
+            [
+                "0",
+                "0"
+            ]
+        ],
+        [
             [
                 "0",
                 "0"
@@ -438,6 +422,22 @@
             [
                 "0",
                 "0"
+            ],
+            [
+                "pawnw",
+                "white"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "knight",
+                "black"
             ],
             [
                 "0",
@@ -462,12 +462,12 @@
                 "0"
             ],
             [
-                "0",
-                "0"
+                "pawnb",
+                "black"
             ],
             [
-                "0",
-                "0"
+                "knight",
+                "white"
             ],
             [
                 "0",
@@ -492,20 +492,20 @@
                 "white"
             ],
             [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
                 "pawnw",
@@ -526,8 +526,8 @@
                 "white"
             ],
             [
-                "queen",
-                "white"
+                "0",
+                "0"
             ],
             [
                 "king",
@@ -538,8 +538,8 @@
                 "white"
             ],
             [
-                "knight",
-                "white"
+                "0",
+                "0"
             ],
             [
                 "rook",
@@ -547,5 +547,534 @@
             ]
         ]
     ],
-    "history": []
+    "history": [
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                6,
+                6
+            ],
+            "new_cell": [
+                4,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                1,
+                6
+            ],
+            "new_cell": [
+                3,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                6,
+                5
+            ],
+            "new_cell": [
+                4,
+                5
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                1,
+                5
+            ],
+            "new_cell": [
+                3,
+                5
+            ]
+        },
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                4,
+                5
+            ],
+            "new_cell": [
+                3,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                1,
+                4
+            ],
+            "new_cell": [
+                3,
+                4
+            ]
+        },
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                6,
+                4
+            ],
+            "new_cell": [
+                4,
+                4
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                3,
+                5
+            ],
+            "new_cell": [
+                4,
+                4
+            ]
+        },
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                3,
+                6
+            ],
+            "new_cell": [
+                2,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                1,
+                7
+            ],
+            "new_cell": [
+                2,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnw",
+            "cell": [
+                6,
+                3
+            ],
+            "new_cell": [
+                4,
+                3
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                1,
+                3
+            ],
+            "new_cell": [
+                3,
+                3
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                7,
+                3
+            ],
+            "new_cell": [
+                6,
+                4
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                0,
+                3
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                6,
+                4
+            ],
+            "new_cell": [
+                6,
+                5
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                6
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                6,
+                5
+            ],
+            "new_cell": [
+                5,
+                6
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                2,
+                6
+            ],
+            "new_cell": [
+                3,
+                6
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                5,
+                6
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                0,
+                6
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "queen",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                7,
+                6
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                3,
+                7
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                3,
+                7
+            ],
+            "new_cell": [
+                2,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                5,
+                5
+            ],
+            "new_cell": [
+                4,
+                7
+            ]
+        },
+        {
+            "piece_type": "pawnb",
+            "cell": [
+                4,
+                4
+            ],
+            "new_cell": [
+                5,
+                4
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                4,
+                7
+            ],
+            "new_cell": [
+                5,
+                5
+            ]
+        },
+        {
+            "piece_type": "knight",
+            "cell": [
+                2,
+                5
+            ],
+            "new_cell": [
+                4,
+                6
+            ]
+        }
+    ]
 }
