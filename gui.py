@@ -123,9 +123,8 @@ def build_top_frame(parent: tk.Window) -> None:
 
         COLOR_CHOICE = theme_combobox.get()
         themes["user choice"] = COLOR_CHOICE
-        f = open("themes.json", "w")
-        f.write(json.dumps(themes))
-        f.close()
+        with open("themes.json", "w") as f:
+            json.dump(themes, f)
         draw_board()
 
     theme_combobox.bind("<<ComboboxSelected>>", change_theme)
@@ -139,7 +138,7 @@ def update_turn_label() -> None:
     top_text.set(f"{COLOR[(GAME_TURN % 2)]}")
 
 
-def build_mainframe(parent) -> None:
+def build_mainframe(parent: tk.Window) -> None:
     """
     build the mainframe with checkerboard on the left and history on the right
     """
@@ -334,14 +333,13 @@ def do_move(y: int, x: int, newy: int, newx: int, color: str) -> None:
     """
     global GAME_TURN, past_board
     if engine.move_piece(current_board, (y, x), (newy, newx), color) is not None:
-        engine.move_piece(current_board, (y, x), (newy, newx), color)
         if engine.is_draw_repetitions(current_board, past_board) or engine.is_stalemate(
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo(title="draw", message="draw")
         else:
             past_board.append(deepcopy(current_board))
-        if engine.is_checkmat(
+        if engine.is_checkmate(
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo(f"Congratulations ! {color} won")

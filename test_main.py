@@ -6,7 +6,7 @@ from engine import (
     history,
     move_piece,
     get_checking_pieces,
-    is_checkmat,
+    is_checkmate,
     is_stalemate,
     list_valid_castling,
 )
@@ -848,7 +848,7 @@ class TestIsCheckMat:
         board[2][0] = ("pawnb", "black")
         board[2][1] = ("pawnb", "black")
         board[2][2] = ("pawnb", "black")
-        assert not is_checkmat(board, (1, 1))
+        assert not is_checkmate(board, (1, 1))
 
     def test_pawn_can_block_check_mate(self):
         board = empty_board()
@@ -857,7 +857,7 @@ class TestIsCheckMat:
         board[5][0] = ("rook", "black")
         board[4][0] = ("rook", "black")
         board[5][1] = ("pawnw", "white")
-        assert not is_checkmat(board, (4, 4))
+        assert not is_checkmate(board, (4, 4))
 
     def test_king_in_double_rook_checkmate(self):
         board = empty_board()
@@ -865,13 +865,13 @@ class TestIsCheckMat:
         board[0][0] = ("king", "black")
         board[6][5] = ("rook", "black")
         board[7][1] = ("rook", "black")
-        assert is_checkmat(board, (7, 7))
+        assert is_checkmate(board, (7, 7))
 
     def test_king_can_escape(self):
         board = empty_board()
         board[4][4] = ("king", "white")
         board[2][5] = ("knight", "black")
-        assert not is_checkmat(board, (4, 4))
+        assert not is_checkmate(board, (4, 4))
 
 
 class TestIsStalemate:

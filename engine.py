@@ -272,7 +272,7 @@ def get_checking_pieces(
     return checking_cells
 
 
-def is_checkmat(board: Board, cell: Position) -> bool:
+def is_checkmate(board: Board, cell: Position) -> bool:
     """
     Returns True if the game is checkmate.
 
@@ -281,7 +281,7 @@ def is_checkmat(board: Board, cell: Position) -> bool:
         cell (Position): Position (y,x) values
 
     Returns:
-        bool: True if check_mat, False otherwise
+        bool: True if checkmate, False otherwise
     """
     color = board[cell[0]][cell[1]][1]
     if not get_checking_pieces(board, cell):
@@ -432,7 +432,7 @@ def move_piece(
         cell (Position): initial position (y,x)
         new_cell (Position): position where to move
         color (str): color of the player's turn
-        no_mem (bool, optional): used to avoid is_check_mate adding things in the HISTORY. Defaults to False.
+        no_mem (bool, optional): used to avoid is_checkmate adding things in the HISTORY. Defaults to False.
 
     Returns:
         Board | None: return the board with the movement done or None if the position is unreachable
