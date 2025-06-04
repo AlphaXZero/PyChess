@@ -318,24 +318,24 @@
                 "black"
             ],
             [
-                "0",
-                "0"
+                "pawnb",
+                "black"
             ],
             [
                 "pawnb",
                 "black"
             ],
             [
-                "0",
-                "0"
+                "pawnb",
+                "black"
             ],
             [
-                "0",
-                "0"
+                "pawnb",
+                "black"
             ],
             [
-                "0",
-                "0"
+                "pawnb",
+                "black"
             ],
             [
                 "pawnb",
@@ -360,40 +360,6 @@
                 "0"
             ],
             [
-                "pawnw",
-                "white"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
-                "0",
-                "0"
-            ]
-        ],
-        [
-            [
-                "0",
-                "0"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
-                "pawnb",
-                "black"
-            ],
-            [
-                "0",
-                "0"
-            ],
-            [
                 "0",
                 "0"
             ],
@@ -420,24 +386,24 @@
                 "0"
             ],
             [
-                "pawnw",
-                "white"
-            ],
-            [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
                 "0",
                 "0"
             ],
             [
-                "pawnw",
-                "white"
+                "0",
+                "0"
             ],
             [
-                "pawnb",
-                "black"
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
             ],
             [
                 "0",
@@ -480,6 +446,40 @@
         ],
         [
             [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ],
+            [
+                "0",
+                "0"
+            ]
+        ],
+        [
+            [
                 "pawnw",
                 "white"
             ],
@@ -488,20 +488,20 @@
                 "white"
             ],
             [
-                "0",
-                "0"
+                "pawnw",
+                "white"
             ],
             [
-                "0",
-                "0"
+                "pawnw",
+                "white"
             ],
             [
-                "0",
-                "0"
+                "pawnw",
+                "white"
             ],
             [
-                "0",
-                "0"
+                "pawnw",
+                "white"
             ],
             [
                 "pawnw",
@@ -547,138 +547,5 @@
             ]
         ]
     ],
-    "history": [
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                6,
-                4
-            ],
-            "new_cell": [
-                4,
-                4
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                1,
-                5
-            ],
-            "new_cell": [
-                3,
-                5
-            ]
-        },
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                4,
-                4
-            ],
-            "new_cell": [
-                3,
-                5
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                1,
-                4
-            ],
-            "new_cell": [
-                3,
-                4
-            ]
-        },
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                3,
-                5
-            ],
-            "new_cell": [
-                2,
-                4
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                1,
-                6
-            ],
-            "new_cell": [
-                2,
-                6
-            ]
-        },
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                6,
-                5
-            ],
-            "new_cell": [
-                4,
-                5
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                2,
-                6
-            ],
-            "new_cell": [
-                3,
-                6
-            ]
-        },
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                6,
-                3
-            ],
-            "new_cell": [
-                4,
-                3
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                3,
-                6
-            ],
-            "new_cell": [
-                4,
-                6
-            ]
-        },
-        {
-            "piece_type": "pawnw",
-            "cell": [
-                6,
-                2
-            ],
-            "new_cell": [
-                4,
-                2
-            ]
-        },
-        {
-            "piece_type": "pawnb",
-            "cell": [
-                1,
-                2
-            ],
-            "new_cell": [
-                3,
-                2
-            ]
-        }
-    ]
+    "history": []
 }

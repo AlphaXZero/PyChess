@@ -330,7 +330,6 @@ def is_stalemate(board: Board, cell: Position) -> bool:
     for i, line in enumerate(board):
         for j, piece in enumerate(line):
             if piece[1] == board[y][x][1]:
-                print(piece)
                 if list_valid_move(board, (i, j)) != []:
                     return False
 
