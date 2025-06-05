@@ -19,9 +19,11 @@ Position = Tuple[int, int]
 VOID_CELL = ["0", "0"]
 COLOR = ("white", "black")
 X_NAME = ("a", "b", "c", "d", "e", "f", "g", "h")
-
-with open("board.json", "r") as f:
-    game_state = json.load(f)
+try:
+    with open("board.json", "r") as f:
+        game_state = json.load(f)
+except FileNotFoundError:
+    print("File not found, be sure to have a board.json file in your directory")
 board: Board = (
     game_state["default"] if game_state["current"] == [] else game_state["current"]
 )

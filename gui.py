@@ -21,8 +21,23 @@ from pieces_draw import (
     LINE_SETTINGS,
 )
 
-with open("themes.json", "r") as f:
-    themes = json.load(f)
+try:
+    with open("themes.json", "r") as f:
+        themes = json.load(f)
+except FileNotFoundError:
+    print("themes.json not found setting default theme")
+    themes = {
+        "color theme": {
+            "Classic": {
+                "white": {"fill": "#f2f2f2", "line": "black"},
+                "black": {"fill": "#464646", "line": "black"},
+                "black_board": "#777777",
+                "white_board": "#ffffff",
+            }
+        },
+        "user choice": "Classic",
+    }
+
 COLOR_CHOICE = themes["user choice"]
 COLOR_THEME = themes["color theme"]
 
@@ -30,7 +45,7 @@ current_board = engine.board
 past_board = [deepcopy(current_board)]
 COLOR = ("white", "black")
 GAME_TURN = len(engine.history)
-FONT_SETTINGS = {"font": ("Times New Roman", 14)}
+FONT_SETTINGS = {"font": ("Arial", 14)}
 
 
 def build_app() -> tk.Window:
@@ -61,6 +76,7 @@ def reset_game_vars() -> None:
     history_label.delete("1.0", tk.END)
     engine.occu_board = 0
     past_board = []
+    update_turn_label()
 
 
 def restart_game() -> None:
@@ -73,8 +89,11 @@ def restart_game() -> None:
         message="Do you want to restart the game ?",
     )
     if is_yes:
-        with open("board.json", "r") as f:
-            boards = json.load(f)
+        try:
+            with open("board.json", "r") as f:
+                boards = json.load(f)
+        except FileNotFoundError:
+            print("File not found, be sure to have a board.json file in your directory")
         boards["current"] = []
         with open("board.json", "w") as f:
             json.dump(boards, f)
@@ -343,8 +362,12 @@ def do_move(y: int, x: int, newy: int, newx: int, color: str) -> None:
             current_board, engine.find_king(current_board, COLOR[((GAME_TURN + 1) % 2)])
         ):
             messagebox.showinfo(f"Congratulations ! {color} won")
-            with open("board.json", "r") as f:
-                boards = json.load(f)
+            try:
+                with open("board.json", "r") as f:
+                    boards = json.load(f)
+            except FileNotFoundError:
+                print("File not found, be sure to have a board.json file in your directory")
+
             boards["current"] = []
             with open("board.json", "w") as f:
                 json.dump(boards, f, indent=4)

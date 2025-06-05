@@ -5,8 +5,11 @@ import gui
 
 def save_game_on_quit():
     gui.build_app().mainloop()
-    with open("board.json", "r") as f:
-        boards = json.load(f)
+    try:
+        with open("board.json", "r") as f:
+            boards = json.load(f)
+    except FileNotFoundError:
+        print("File not found, be sure to have a board.json file in your directory")
     boards["current"] = gui.current_board
     boards["history"] = engine.history
     with open("board.json", "w") as f:
