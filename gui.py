@@ -55,7 +55,7 @@ def build_app() -> tk.Window:
     Returns:
         tk.Window: main window
     """
-    global top_text, root
+    global root
     root = tk.Window(title="PyChess", themename="darkly", minsize=(SIZE * 8, SIZE * 8))
     build_top_frame(root)
     build_mainframe(root)
@@ -249,6 +249,7 @@ def draw_board():
     for i, line in enumerate(current_board):
         for j, piece in enumerate(line):
             draw_piece(piece, j, i)
+    root.update_idletasks()
 
 
 def draw_piece(piece: str, x: int, y: int):
