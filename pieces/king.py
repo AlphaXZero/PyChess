@@ -1,8 +1,8 @@
 from pieces.piece import Piece
 
 
-class Queen(Piece):
+class King(Piece):
     def get_starting_cell():
-        return [Queen("white", 4, 1), Queen("black", 4, 8)]
+        return [King("white", 5, 1), King("black", 5, 8)]
 
     def get_move(self, position): ...
