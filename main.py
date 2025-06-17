@@ -18,4 +18,3 @@ def save_game_on_quit():
 
 if __name__ == "__main__":
     save_game_on_quit()
- 

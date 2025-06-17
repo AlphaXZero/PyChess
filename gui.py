@@ -8,7 +8,7 @@ from copy import deepcopy
 from tkinter import messagebox
 import ttkbootstrap as tk
 import engine
-from pieces_draw import (
+from draw_pieces import (
     SIZE,
     draw_bishop,
     draw_help_circles,
@@ -367,7 +367,9 @@ def do_move(y: int, x: int, newy: int, newx: int, color: str) -> None:
                 with open("board.json", "r") as f:
                     boards = json.load(f)
             except FileNotFoundError:
-                print("File not found, be sure to have a board.json file in your directory")
+                print(
+                    "File not found, be sure to have a board.json file in your directory"
+                )
 
             boards["current"] = []
             with open("board.json", "w") as f:
