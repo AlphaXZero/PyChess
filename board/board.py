@@ -55,3 +55,23 @@ class Board:
                     print("0", end="  ")
             print()
         print(" ", "  ".join(X_NAME))
+
+    def check_move(self, y, x):
+        piece = self.get_piece(y, x)
+        moves = []
+        if piece is None:
+            return moves
+
+        move_distance = range(1, 8) if piece.repeat else range(1, 2)
+        for dy, dx in piece.moveset:
+            for step in move_distance:
+                new_x = piece.x + dx * step
+                new_y = piece.y + dy * step
+                cell_item = self.get_piece(new_y, new_x)
+                if (0 <= new_x <= 7 and 0 <= new_y <= 7) and (
+                    cell_item is None or piece.color != cell_item.color
+                ):
+                    moves.append((new_y, new_x))
+                else:
+                    break
+        return moves

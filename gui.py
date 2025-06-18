@@ -27,7 +27,7 @@ try:
 except FileNotFoundError:
     print("themes.json not found setting default theme")
     themes = {
-        "color theme": {
+        "color_theme": {
             "Classic": {
                 "white": {"fill": "#f2f2f2", "line": "black"},
                 "black": {"fill": "#464646", "line": "black"},
@@ -35,11 +35,11 @@ except FileNotFoundError:
                 "white_board": "#ffffff",
             }
         },
-        "user choice": "Classic",
+        "user_choice": "Classic",
     }
 
-COLOR_CHOICE = themes["user choice"]
-COLOR_THEME = themes["color theme"]
+COLOR_CHOICE = themes["user_choice"]
+COLOR_THEME = themes["color_theme"]
 
 current_board = engine.board
 past_board = [deepcopy(current_board)]
@@ -124,7 +124,7 @@ def build_top_frame(parent: tk.Window) -> None:
     button = tk.Button(
         top_frame, command=restart_game, text="Restart", bootstyle="danger"
     )
-    button.pack(side="left", padx=(SIZE * 4.6) / 2, pady=4)
+    button.pack(side="left", padx=int((SIZE * 4.6) / 2), pady=4)
 
     theme_label = tk.Label(top_frame, text="Theme :", **FONT_SETTINGS)
     theme_combobox = tk.Combobox(
@@ -141,7 +141,7 @@ def build_top_frame(parent: tk.Window) -> None:
         global COLOR_CHOICE
 
         COLOR_CHOICE = theme_combobox.get()
-        themes["user choice"] = COLOR_CHOICE
+        themes["user_choice"] = COLOR_CHOICE
         with open("themes.json", "w") as f:
             json.dump(themes, f)
         draw_board()

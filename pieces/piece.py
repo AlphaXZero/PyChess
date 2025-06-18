@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class Piece(ABC):
@@ -6,19 +6,22 @@ class Piece(ABC):
         self.color = color
         self.y = y
         self.x = x
-        self.repeat = range(1, 8)
 
-    def get_move(self):
-        moves = []
-        for dy, dx in self.moveset:
-            for step in self.repeat:
-                new_x = self.x + dx * step
-                new_y = self.y + dy * step
-                if 0 <= new_x <= 7 and 0 <= new_y <= 7:
-                    moves.append((new_y, new_x))
-                else:
-                    break
-        return moves
+    def draw_piece(self, canvas, size, piece_colors, piece_lines):
+        canvas.create_text(
+            self.x * size + int(size * 0.52),
+            self.y * size + int(size * 0.52),
+            text=self.repr,
+            font=("Helvetica", int(size * 0.7)),
+            fill=piece_lines[self.color],
+        )
+        canvas.create_text(
+            self.x * size + int(size * 0.5),
+            self.y * size + int(size * 0.5),
+            text=self.repr,
+            font=("Helvetica", int(size * 0.7)),
+            fill=piece_colors[self.color],
+        )
 
     def convert_chess_coordinate(self):
         chess_row = ["a", "b", "c", "d", "e", "f", "g", "h"]

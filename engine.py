@@ -515,21 +515,4 @@ def format_history(history: list[dict[str]]) -> list[str]:
 
 
 if __name__ == "__main__":
-    board = 
-    board[7][0] = ("rook", "white")
-    board[7][3] = ("king", "white")
-    board[7][1] = ("pawnw", "white")
-    board[0][0] = ("rook", "black")
-    board[0][4] = ("king", "black")
-    board[0][7] = ("rook", "black")
-    board[7][7] = ("rook", "white")
-    board[4][0] = ("pawnw", "white")
-    board[4][7] = ("pawnw", "white")
-    board = move_piece(board, (7, 1), (6, 1), "white")
-    board = move_piece(board, (0, 4), (0, 3), "black")
-    board = move_piece(board, (6, 1), (5, 1), "white")
-    board = move_piece(board, (0, 3), (0, 4), "black")
-    board = move_piece(board, (7, 7), (6, 7), "white")
-    board = move_piece(board, (0, 4), (0, 3), "black")
-    board = move_piece(board, (6, 7), (7, 7), "white")
-
+    pass
