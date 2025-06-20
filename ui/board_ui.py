@@ -4,13 +4,14 @@ import json
 
 
 class BoardUI(ttk.Frame):
-    def __init__(self, parent, size):
+    def __init__(self, parent, size, text_turn):
         super().__init__(parent)
         self.size = size
         self.case_size = size // 8
         self.load_theme()
-        self.move_choice = []
-        self.possible_moves = None
+        self.move_choice = None
+        self.possible_moves = []
+        self.text_turn = text_turn
 
         self.canvas = Canvas(self, width=self.size, height=self.size)
         self.canvas.pack(side="right", expand=True, fill="both")
@@ -89,20 +90,25 @@ class BoardUI(ttk.Frame):
     def show_possible_moves(self, event):
         x = event.x // self.case_size
         y = event.y // self.case_size
-        self.possible_moves = self.possible_moves or self.current_board.check_move(y, x)
+        if not self.possible_moves:
+            self.possible_moves = self.current_board.check_move(y, x)
 
-        if self.move_choice == [] and self.possible_moves != []:
+        if not self.move_choice and self.possible_moves != []:
             self.draw_help_circles(self.possible_moves)
-            self.move_choice.append((y, x))
-        elif len(self.move_choice) == 1 and (y, x) in self.possible_moves:
-            self.draw_help_circles(self.possible_moves)
-            self.move_choice.append((y, x))
-
-        # elif len(self.move_choice) == 1 and :
-        else:
-            self.move_choice = []
-            self.possible_moves = None
+            self.move_choice = (y, x)
+        if self.move_choice:
             self.update_board()
-        print(self.move_choice)
-
-    def show_move(self): ...
+            if (y, x) in self.possible_moves:
+                self.current_board.do_move(self.move_choice, (y, x))
+                self.text_turn.set(self.current_board.color_turn)
+                self.update_board()
+                self.possible_moves = []
+                self.move_choice = None
+            else:
+                self.move_choice = (y, x)
+                self.possible_moves = self.current_board.check_move(y, x)
+                self.draw_help_circles(self.possible_moves)
+        else:
+            self.move_choice = None
+            self.possible_moves = []
+            self.update_board()

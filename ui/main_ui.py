@@ -63,5 +63,5 @@ class MainWindow(ttk.Window):
         checkerboard_frame = ttk.Frame(self.main_frame, borderwidth=4)
         checkerboard_frame.pack(side="left")
 
-        self.boardui = BoardUI(checkerboard_frame, self.board_size)
+        self.boardui = BoardUI(checkerboard_frame, self.board_size, self.text_turn)
         self.boardui.pack()

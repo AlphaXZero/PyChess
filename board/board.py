@@ -5,16 +5,20 @@ from pieces.king import King
 from pieces.bishop import Bishop
 from pieces.knight import Knight
 from pieces.piece import Piece
+from copy import deepcopy
 import colorama as c
 
 
 class Board:
     def __init__(self):
         self.board = [[None for _ in range(8)] for _ in range(8)]
+        self.previous_board = deepcopy(self.board)
         self.game_turn = 1
-        self.color_turn = self.get_color_turn()
+        self.capture = {"white": [], "black": []}
+        self.history = []
 
-    def get_color_turn(self):
+    @property
+    def color_turn(self):
         return ("white", "black")[(self.game_turn - 1) % 2]
 
     def get_piece(self, y, x):
@@ -56,11 +60,15 @@ class Board:
             print()
         print(" ", "  ".join(X_NAME))
 
-    def check_move(self, y, x):
+    def check_move(self, y, x, only_control=False):
         piece = self.get_piece(y, x)
         moves = []
         if piece is None:
             return moves
+        if piece.color != self.color_turn:
+            return moves
+        if isinstance(piece, Pawn):
+            return self.check_pawn_move(y, x)
 
         move_distance = range(1, 8) if piece.repeat else range(1, 2)
         for dy, dx in piece.moveset:
@@ -75,3 +83,53 @@ class Board:
                 else:
                     break
         return moves
+
+    def check_pawn_move(self, y, x):
+        valid_moves = []
+        piece = self.get_piece(y, x)
+        new_y, new_x = piece.y + piece.moveset[0][0], piece.x + piece.moveset[0][1]
+        if 0 <= new_y <= 7 and 0 <= new_x <= 7 and self.board[new_y][new_x] is None:
+            valid_moves.append((new_y, new_x))
+            if len(piece.moveset) == 2:
+                new_y, new_x = (
+                    piece.y + piece.moveset[1][0],
+                    piece.x + piece.moveset[1][1],
+                )
+                if (
+                    0 <= new_y <= 7
+                    and 0 <= new_x <= 7
+                    and self.board[new_y][new_x] is None
+                ):
+                    valid_moves.append((new_y, new_x))
+        for dy, dx in piece.controled_cell:
+            new_y, new_x = piece.y + dy, piece.x + dx
+            capturable_piece = self.get_piece(new_y, new_x)
+            if (
+                0 <= new_y <= 7
+                and 0 <= new_x <= 7
+                and capturable_piece is not None
+                and capturable_piece.color != piece.color
+            ):
+                valid_moves.append((new_y, new_x))
+
+        return valid_moves
+
+    def do_move(self, inital_pos, final_pos):
+        y, x = inital_pos
+        newy, newx = final_pos
+        moving_piece = self.get_piece(y, x)
+        piece_destination = self.get_piece(newy, newx)
+        if moving_piece:
+            if piece_destination and piece_destination.color == moving_piece.color:
+                return None
+            if piece_destination:
+                self.capture[moving_piece.color]
+            self.board[newy][newx], self.board[y][x] = self.board[y][x], None
+            moving_piece.x, moving_piece.y = newx, newy
+            self.game_turn += 1
+
+    def update_history(self, ny, nx):
+        piece: Piece = self.get_piece(ny, nx)
+        self.history.append(
+            {"turn": self.game_turn, "inital": piece.convert_chess_coordinate()}
+        )
