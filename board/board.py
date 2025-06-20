@@ -21,6 +21,10 @@ class Board:
     def color_turn(self) -> str:
         return ("white", "black")[(self.game_turn - 1) % 2]
 
+    @property
+    def opponent_color(self) -> str:
+        return ("white", "black")[(self.game_turn) % 2]
+
     def get_piece(self, y: int, x: int) -> Piece | None:
         if 0 <= x < 8 and 0 <= y < 8:
             return self.board[y][x]
@@ -64,26 +68,23 @@ class Board:
     def check_move(self, y: int, x: int, only_control=False) -> list[tuple[int, int]]:
         piece = self.get_piece(y, x)
         moves = []
-        if piece is None:
-            return moves
-        if piece.color != self.color_turn:
+        move_distance_range = 8 if piece.repeat else 2
+        if piece.color != self.color_turn or piece is None:
             return moves
         if isinstance(piece, Pawn):
             return self.check_pawn_move(y, x)
-        move_distance = range(1, 8) if piece.repeat else range(1, 2)
         for dy, dx in piece.moveset:
-            for step in move_distance:
+            for step in range(1, move_distance_range):
                 new_x = piece.x + dx * step
                 new_y = piece.y + dy * step
+                if not (0 <= new_x <= 7 and 0 <= new_y <= 7):
+                    break
                 cell_item = self.get_piece(new_y, new_x)
-                if 0 <= new_x <= 7 and 0 <= new_y <= 7:
-                    if cell_item is None:
-                        moves.append((new_y, new_x))
-                    elif piece.color != cell_item.color:
-                        moves.append((new_y, new_x))
-                        break
-                    else:
-                        break
+                if cell_item is None:
+                    moves.append((new_y, new_x))
+                elif piece.color != cell_item.color:
+                    moves.append((new_y, new_x))
+                    break
                 else:
                     break
         return moves
@@ -115,7 +116,6 @@ class Board:
                 and capturable_piece.color != piece.color
             ):
                 valid_moves.append((new_y, new_x))
-
         return valid_moves
 
     def do_move(self, inital_pos: tuple[int, int], final_pos: tuple[int, int]) -> None:
@@ -140,8 +140,34 @@ class Board:
                 "turn": self.game_turn,
                 "inital": piece.convert_chess_coordinate(),
                 "final": piece.convert_chess_coordinate(ny, nx),
-                "board": deepcopy(self.board),
                 "capture": deepcopy(self.capture),
             }
         )
         print(self.history)
+
+    def list_checking_pieces(self, y: int, x: int) -> list[int, int]:
+        """
+        Returns a list of coordinates (y, x) of all pieces that are currently checking
+        a specific target cell
+        """
+        checking_pieces = []
+        temp_piece = (
+            Queen(self.opponent_color, y, x)
+            if self.get_piece(y, x) is None
+            else self.get_piece(y, x)
+        )
+        self.board[y][x] = temp_piece
+        for row in self.board:
+            for piece in row:
+                if isinstance(piece, Piece):
+                    if (y, x) in self.check_move(piece.y, piece.x):
+                        checking_pieces.append(self.get_piece(piece.y, piece.x))
+        self.board[y][x] = None
+        return checking_pieces
+
+
+if __name__ == "__main__":
+    board2 = Board()
+    board2.new_board()
+    board2.print_board()
+    print(board2.list_checkink_pieces(5, 0))
