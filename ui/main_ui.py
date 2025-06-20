@@ -1,4 +1,3 @@
-from board.board import Board
 import tkinter as tk
 import ttkbootstrap as ttk
 import json
