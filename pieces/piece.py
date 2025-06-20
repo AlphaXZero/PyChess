@@ -23,6 +23,11 @@ class Piece(ABC):
             fill=piece_colors[self.color],
         )
 
-    def convert_chess_coordinate(self):
+    def __repr__(self):
+        return f"{self.__class__.__name__};{self.color};{self.y};{self.x}"
+
+    def convert_chess_coordinate(self, y=None, x=None):
         chess_row = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        if y and x:
+            return (chess_row[x], y)
         return (chess_row[self.x], self.y)
