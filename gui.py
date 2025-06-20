@@ -124,7 +124,7 @@ def build_top_frame(parent: tk.Window) -> None:
     button = tk.Button(
         top_frame, command=restart_game, text="Restart", bootstyle="danger"
     )
-    button.pack(side="left", padx=(SIZE * 4.6) / 2, pady=4)
+    button.pack(side="left", padx=int((SIZE * 4.6) / 2), pady=4)
 
     theme_label = tk.Label(top_frame, text="Theme :", **FONT_SETTINGS)
     theme_combobox = tk.Combobox(
@@ -367,7 +367,9 @@ def do_move(y: int, x: int, newy: int, newx: int, color: str) -> None:
                 with open("board.json", "r") as f:
                     boards = json.load(f)
             except FileNotFoundError:
-                print("File not found, be sure to have a board.json file in your directory")
+                print(
+                    "File not found, be sure to have a board.json file in your directory"
+                )
 
             boards["current"] = []
             with open("board.json", "w") as f:

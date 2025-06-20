@@ -1,5 +1,2 @@
--numéroté case
--Verifier draw 50 coups sans prise
--verifier draw 3 coups les mêmes
--bouton se rendre
--bug scroll
+Small chess game
+van der Veen Georgé

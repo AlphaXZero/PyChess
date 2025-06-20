@@ -396,12 +396,11 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
             ):
                 flag = False
                 break
-        for i in range(5):
-            if get_checking_pieces(board, (y, 0 + i), color) != []:
+        for inter_x in range(0, x + 1):
+            if get_checking_pieces(board, (y, inter_x), color):
                 flag = False
-                break
         if flag:
-            valid_castling_moves.append((y, len(board[y][1:x]) - 1))
+            valid_castling_moves.append((y, 2))
     # right
     if board[y][-1][0] == "rook" and board[y][x + 1 : -1] == [VOID_CELL] * (abs(x - 6)):
         flag = True
@@ -413,12 +412,11 @@ def list_valid_castling(board: Board, color: str) -> list[Position]:
             ):
                 flag = False
                 break
-        for i in range(4):
-            if get_checking_pieces(board, (y, 4 + i), color) != []:
+        for col in range(x, 8):
+            if get_checking_pieces(board, (y, col), color):
                 flag = False
-                break
         if flag:
-            valid_castling_moves.append((y, 4 + len(board[y][1:x]) - 1))
+            valid_castling_moves.append((y, 6))
 
     return valid_castling_moves
 
