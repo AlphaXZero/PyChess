@@ -165,9 +165,19 @@ class Board:
         self.board[y][x] = None
         return checking_pieces
 
+    def find_king(self):
+        for row in self.board:
+            for piece in row:
+                if (
+                    isinstance(piece, Piece)
+                    and piece.__class__.__name__ == "King"
+                    and piece.color == self.color_turn
+                ):
+                    return piece
+
 
 if __name__ == "__main__":
     board2 = Board()
     board2.new_board()
     board2.print_board()
-    print(board2.list_checkink_pieces(5, 0))
+    print(board2.find_king())
