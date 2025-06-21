@@ -15,7 +15,7 @@ class BoardUI(ttk.Frame):
 
         self.canvas = Canvas(self, width=self.size, height=self.size)
         self.canvas.pack(side="right", expand=True, fill="both")
-        self.canvas.bind("<Button-1>", self.show_possible_moves)
+        self.canvas.bind("<Button-1>", self.handle_click_and_move)
 
         self.current_board = Board()
         self.current_board.new_board()
@@ -87,11 +87,13 @@ class BoardUI(ttk.Frame):
                 width=4,
             )
 
-    def show_possible_moves(self, event):
+    def handle_click_and_move(self, event):
         x = event.x // self.case_size
         y = event.y // self.case_size
         if not self.possible_moves:
-            self.possible_moves = self.current_board.check_move(y, x)
+            self.possible_moves = self.current_board.check_move(
+                self.current_board.get_piece(y, x)
+            )
 
         if not self.move_choice and self.possible_moves != []:
             self.draw_help_circles(self.possible_moves)
@@ -99,14 +101,18 @@ class BoardUI(ttk.Frame):
         if self.move_choice:
             self.update_board()
             if (y, x) in self.possible_moves:
-                self.current_board.do_move(self.move_choice, (y, x))
+                self.current_board.do_move(
+                    self.current_board.get_piece(*self.move_choice), (y, x)
+                )
                 self.text_turn.set(self.current_board.color_turn)
                 self.update_board()
                 self.possible_moves = []
                 self.move_choice = None
             else:
                 self.move_choice = (y, x)
-                self.possible_moves = self.current_board.check_move(y, x)
+                self.possible_moves = self.current_board.check_move(
+                    self.current_board.get_piece(*self.move_choice)
+                )
                 self.draw_help_circles(self.possible_moves)
         else:
             self.move_choice = None

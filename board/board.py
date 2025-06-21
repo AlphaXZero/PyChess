@@ -10,8 +10,9 @@ import colorama as c
 
 
 class Board:
-    def __init__(self):
-        self.board = [[None for _ in range(8)] for _ in range(8)]
+    def __init__(self, load_board=None):
+        self.board = load_board or [[None for _ in range(8)] for _ in range(8)]
+        self.new_board()
         self.previous_board = deepcopy(self.board)
         self.game_turn = 1
         self.capture = {"white": [], "black": []}
@@ -65,14 +66,13 @@ class Board:
             print()
         print(" ", "  ".join(X_NAME))
 
-    def check_move(self, y: int, x: int, only_control=False) -> list[tuple[int, int]]:
-        piece = self.get_piece(y, x)
+    def check_move(self, piece, only_control=False) -> list[tuple[int, int]]:
         moves = []
-        move_distance_range = 8 if piece.repeat else 2
-        if piece.color != self.color_turn or piece is None:
+        if piece is None or piece.color != self.color_turn:
             return moves
         if isinstance(piece, Pawn):
-            return self.check_pawn_move(y, x)
+            return self.check_pawn_move(piece.y, piece.x)
+        move_distance_range = 8 if piece.repeat else 2
         for dy, dx in piece.moveset:
             for step in range(1, move_distance_range):
                 new_x = piece.x + dx * step
@@ -118,20 +118,18 @@ class Board:
                 valid_moves.append((new_y, new_x))
         return valid_moves
 
-    def do_move(self, inital_pos: tuple[int, int], final_pos: tuple[int, int]) -> None:
-        y, x = inital_pos
+    def do_move(self, piece_to_move: Piece, final_pos: tuple[int, int]) -> None:
         newy, newx = final_pos
-        moving_piece = self.get_piece(y, x)
+        y, x = piece_to_move.y, piece_to_move.x
         piece_destination = self.get_piece(newy, newx)
-        if moving_piece:
-            if piece_destination and piece_destination.color == moving_piece.color:
-                return
-            if piece_destination:
-                self.capture[moving_piece.color].append(moving_piece.__class__.__name__)
-            self.board[newy][newx], self.board[y][x] = self.board[y][x], None
-            self.update_history(newy, newx)
-            moving_piece.x, moving_piece.y = newx, newy
-            self.game_turn += 1
+        if piece_destination and piece_destination.color == piece_to_move.color:
+            return
+        if piece_destination:
+            self.capture[piece_to_move.color].append(piece_to_move.__class__.__name__)
+        self.board[newy][newx], self.board[y][x] = self.board[y][x], None
+        self.update_history(newy, newx)
+        piece_to_move.x, piece_to_move.y = newx, newy
+        self.game_turn += 1
 
     def update_history(self, ny: int, nx: int) -> None:
         piece: Piece = self.get_piece(ny, nx)
@@ -160,7 +158,7 @@ class Board:
         for row in self.board:
             for piece in row:
                 if isinstance(piece, Piece):
-                    if (y, x) in self.check_move(piece.y, piece.x):
+                    if (y, x) in self.check_move(piece):
                         checking_pieces.append(self.get_piece(piece.y, piece.x))
         self.board[y][x] = None
         return checking_pieces
@@ -175,9 +173,27 @@ class Board:
                 ):
                     return piece
 
+    def is_checkmate(self):
+        king = self.find_king()
+        cheking_pieces = self.list_checking_pieces(king.y, king.x)
+        if cheking_pieces == []:
+            return []
+
+        for i in cheking_pieces:
+            temp_board = Board(deepcopy(self.board))
+            temp_board.game_turn = self.game_turn
+            temp_king = self.find_king()
+            for i in temp_board.check_move(temp_king):
+                # TODO :remplacer par undo
+                temp_board.board = deepcopy(self.board)
+                temp_king_coord = temp_king.y, temp_king.x
+                temp_board.do_move(temp_king, temp_king_coord)
+                if temp_board.list_checking_pieces(temp_king.y, temp_king.x) == []:
+                    return False
+        return True
+
 
 if __name__ == "__main__":
     board2 = Board()
-    board2.new_board()
     board2.print_board()
-    print(board2.find_king())
+    print(board2.is_checkmate)
