@@ -10,9 +10,10 @@ import colorama as c
 
 
 class Board:
-    def __init__(self, load_board=None):
+    def __init__(self, load_board=None, void_board=False):
         self.board = load_board or [[None for _ in range(8)] for _ in range(8)]
-        self.new_board()
+        if not void_board:
+            self.new_board()
         self.previous_board = deepcopy(self.board)
         self.game_turn = 1
         self.capture = {"white": [], "black": []}
@@ -157,9 +158,9 @@ class Board:
         self.board[y][x] = temp_piece
         for row in self.board:
             for piece in row:
-                if isinstance(piece, Piece):
-                    if (y, x) in self.check_move(piece):
-                        checking_pieces.append(self.get_piece(piece.y, piece.x))
+                print(self.check_move(piece))
+                if isinstance(piece, Piece) and (y, x) in self.check_move(piece):
+                    checking_pieces.append(self.get_piece(piece.y, piece.x))
         self.board[y][x] = None
         return checking_pieces
 
@@ -194,6 +195,11 @@ class Board:
 
 
 if __name__ == "__main__":
-    board2 = Board()
+    board2 = Board(void_board=True)
+    board2.board[0][0] = King("black", 0, 0)
+    board2.board[3][0] = King("white", 3, 0)
+    board2.board[3][2] = Rook("black", 3, 2)
+    board2.board[0][2] = Rook("white", 0, 2)
     board2.print_board()
-    print(board2.is_checkmate)
+    # print(board2.list_checking_pieces(0, 0))
+    print(board2.check_move(board2.board[3][2]))
