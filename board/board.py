@@ -144,24 +144,25 @@ class Board:
         )
         print(self.history)
 
-    def list_checking_pieces(self, y: int, x: int) -> list[int, int]:
+    def list_checking_pieces(self, y: int, x: int, color: str = None) -> list[int, int]:
         """
         Returns a list of coordinates (y, x) of all pieces that are currently checking
         a specific target cell
         """
         checking_pieces = []
-        temp_piece = (
-            Queen(self.opponent_color, y, x)
-            if self.get_piece(y, x) is None
-            else self.get_piece(y, x)
-        )
-        self.board[y][x] = temp_piece
+        temp = False
+        if self.get_piece is None:
+            temp = True
+        piece = Queen(self.opponent_color, y, x) if temp else self.get_piece(y, x)
+        self.board[y][x] = piece
+        if color:
+            piece.color = color
         for row in self.board:
             for piece in row:
-                print(self.check_move(piece))
                 if isinstance(piece, Piece) and (y, x) in self.check_move(piece):
                     checking_pieces.append(self.get_piece(piece.y, piece.x))
-        self.board[y][x] = None
+        if temp:
+            self.board[y][x] = None
         return checking_pieces
 
     def find_king(self):
@@ -195,11 +196,14 @@ class Board:
 
 
 if __name__ == "__main__":
+    pass
     board2 = Board(void_board=True)
+    board2.game_turn = 2
     board2.board[0][0] = King("black", 0, 0)
     board2.board[3][0] = King("white", 3, 0)
     board2.board[3][2] = Rook("black", 3, 2)
     board2.board[0][2] = Rook("white", 0, 2)
     board2.print_board()
-    # print(board2.list_checking_pieces(0, 0))
-    print(board2.check_move(board2.board[3][2]))
+    print(board2.color_turn)
+    print("Roi Noir ->", board2.list_checking_pieces(0, 0, "black"))
+    print("Roi blanc ->", board2.list_checking_pieces(3, 0))

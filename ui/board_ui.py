@@ -87,6 +87,17 @@ class BoardUI(ttk.Frame):
                 width=4,
             )
 
+    def draw_warn_circles(self, position_to_warn):
+        for y, x in position_to_warn:
+            self.canvas.create_oval(
+                (x * self.case_size) + self.case_size * 0.06,
+                (y * self.case_size) + self.case_size * 0.06,
+                (x * self.case_size) + self.case_size * 0.94,
+                (y * self.case_size) + self.case_size * 0.94,
+                outline="orange",
+                width=4,
+            )
+
     def handle_click_and_move(self, event):
         x = event.x // self.case_size
         y = event.y // self.case_size
@@ -94,6 +105,12 @@ class BoardUI(ttk.Frame):
             self.possible_moves = self.current_board.check_move(
                 self.current_board.get_piece(y, x)
             )
+
+        king_pos = self.current_board.find_king()
+
+        self.draw_warn_circles(
+            self.current_board.list_checking_pieces(king_pos.y, king_pos.x)
+        )
 
         if not self.move_choice and self.possible_moves != []:
             self.draw_help_circles(self.possible_moves)
