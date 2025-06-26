@@ -19,6 +19,7 @@ class MainWindow(ttk.Window):
         self.build_top_frame()
         self.build_checkerboard()
 
+    # TODO mettre dans un autre fichier pour plus de clareté ?!
     def build_top_frame(self):
         top_frame = ttk.Frame(self.main_frame, borderwidth=4)
         top_frame.pack(side="top", fill="x")

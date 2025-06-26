@@ -67,7 +67,11 @@ class Board:
             print()
         print(" ", "  ".join(X_NAME))
 
-    def check_move(self, piece, only_control=False) -> list[tuple[int, int]]:
+    # TODO choisir une couleur au lieu de regarder le turn ?
+    def check_move(self, piece: Piece) -> list[tuple[int, int]]:
+        """
+        return all the cells where a piece can go
+        """
         moves = []
         if piece is None or piece.color != self.color_turn:
             return moves
@@ -91,6 +95,9 @@ class Board:
         return moves
 
     def check_pawn_move(self, y: int, x: int) -> list[tuple[int, int]]:
+        """
+        return all the cells where a pawn can go
+        """
         valid_moves = []
         piece = self.get_piece(y, x)
         new_y, new_x = piece.y + piece.moveset[0][0], piece.x + piece.moveset[0][1]
@@ -120,6 +127,9 @@ class Board:
         return valid_moves
 
     def do_move(self, piece_to_move: Piece, final_pos: tuple[int, int]) -> None:
+        """
+        move a piece in the self.board
+        """
         newy, newx = final_pos
         y, x = piece_to_move.y, piece_to_move.x
         piece_destination = self.get_piece(newy, newx)
@@ -144,6 +154,7 @@ class Board:
         )
         print(self.history)
 
+    # TODO : Ne marche pas à cause de la couleur
     def list_checking_pieces(self, y: int, x: int, color: str = None) -> list[int, int]:
         """
         Returns a list of coordinates (y, x) of all pieces that are currently checking
@@ -165,7 +176,9 @@ class Board:
             self.board[y][x] = None
         return checking_pieces
 
+    # TODO : mettre la couleur en parametre ?
     def find_king(self):
+        """return the king"""
         for row in self.board:
             for piece in row:
                 if (

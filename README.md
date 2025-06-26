@@ -1,5 +1,2 @@
--numéroté case
--Verifier draw 50 coups sans prise
--verifier draw 3 coups les mêmes
--bouton se rendre
--bug scroll
+Object refacto pychess
+Run game.py to launch the game
